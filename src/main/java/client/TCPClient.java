@@ -1,47 +1,67 @@
 package src.main.java.client;
 
+/*
+ * 22. 10. 10
+ */
 
+/**
+ *
+ * @author Peter Altenberd
+ * (Translated into English by Ronald Moore)
+ * Computer Science Dept.                   Fachbereich Informatik
+ * Darmstadt Univ. of Applied Sciences      Hochschule Darmstadt
+ */
 
 import java.io.*;
 import java.net.*;
+import java.rmi.server.UID;
 
 public class TCPClient {
-	private static String host = "localhost";
-	private static int port = 9999;
-	private static String line;
-	private static Socket socket;
-	private static BufferedReader fromServer;
-	private static DataOutputStream toServer;
-	private static UserInterface user;
+  public String uId;
+  static String line;
+  static Socket socket;
+  static BufferedReader fromServer;
+  static DataOutputStream toServer;
+  static UserInterface user = new UserInterface();
+  
+  public TCPClient() {
+	uId = TCPClient.generateUID();
+	System.out.println("UID : "+uId);
+  }
 
-	public static void main(String[] args) throws Exception {
-		socket = new Socket(host, port);
-		fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Datastream TO Server
-		toServer = new DataOutputStream(socket.getOutputStream()); // Datastream FROM Server
-		user = new UserInterface();
+  static void connectToServer() throws UnknownHostException, IOException {
+	  socket = new Socket("localhost", 9999);
+	    toServer = new DataOutputStream(     // Datastream FROM Server
+	      socket.getOutputStream());
+	    fromServer = new BufferedReader(     // Datastream TO Server
+	      new InputStreamReader(socket.getInputStream()));
+	    sendRequest();             // Send requests while connected
+	    receiveResponse();                 // Process server's answer
+	    socket.close();
+	    toServer.close();
+	    fromServer.close();
+	    System.out.println("Terminated");
+  }
+  
+  
+  private static boolean sendRequest() throws IOException {
+    boolean holdTheLine = true;          // Connection exists
+    user.output("Sending message");
+    toServer.writeBytes("message \n");
+    return true;
+  }
 
-		while (sendRequest()) { // Send requests while connected
-			receiveResponse(); // Process server's answer
-		}
+  private static void receiveResponse() throws IOException {
+    user.output("Server answers: " +
+      new String(fromServer.readLine()) + '\n');
+  }
+  
+  public static  String generateUID() {
+	  UID id = null;
+	  for (int idx=0; idx<10; ++idx){
+	      id = new UID();
+	  }
+	  return id.toString();
+  }
 
-		socket.close();
-		toServer.close();
-		fromServer.close();
-	}
-
-	private static boolean sendRequest() throws IOException {
-		boolean holdTheLine = true; // Connection exists
-
-		user.output("Enter message for the Server, or end the session with . : ");
-		toServer.writeBytes((line = user.input()) + '\n');
-		if (line.equals(".")) { // Does the user want to end the session?
-			holdTheLine = false;
-		}
-
-		return holdTheLine;
-	}
-
-	private static void receiveResponse() throws IOException {
-		user.output("Server answers: " + new String(fromServer.readLine()) + '\n');
-	}
 }
