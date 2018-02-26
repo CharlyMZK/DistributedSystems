@@ -1,4 +1,6 @@
 package main.java.messages;
+import org.json.*;
+
 
 public class Request {
 	String idClient, idRequest, stockName;
@@ -6,11 +8,17 @@ public class Request {
 	Integer quantity;
 	Double price;
 	
-	public String getJson()
+	public String getJson() throws JSONException
 	{
-		ObjectMapper mapper = new ObjectMapper();
+		JSONObject obj = new JSONObject(" .... ");
+		String pageName = obj.getJSONObject("pageInfo").getString("pageName");
 
-		//Object to JSON in String
-		String jsonInString = mapper.writeValueAsString(this);
+		JSONArray arr = obj.getJSONArray("posts");
+		for (int i = 0; i < arr.length(); i++)
+		{
+		    String post_id = arr.getJSONObject(i).getString("post_id");
+		    
+		}
+		return null;
 	}
 }
