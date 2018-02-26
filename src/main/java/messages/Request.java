@@ -10,15 +10,20 @@ public class Request {
 	
 	public String getJson() throws JSONException
 	{
-		JSONObject obj = new JSONObject(" .... ");
-		String pageName = obj.getJSONObject("pageInfo").getString("pageName");
+		String message;
+		JSONObject json = new JSONObject();
+		json.put("name", "student");
 
-		JSONArray arr = obj.getJSONArray("posts");
-		for (int i = 0; i < arr.length(); i++)
-		{
-		    String post_id = arr.getJSONObject(i).getString("post_id");
-		    
-		}
-		return null;
+		JSONArray array = new JSONArray();
+		JSONObject item = new JSONObject();
+		item.put("information", "test");
+		item.put("id", 3);
+		item.put("name", "course1");
+		array.put(item);
+
+		json.put("course", array);
+
+		message = json.toString();
+		return message;
 	}
 }
