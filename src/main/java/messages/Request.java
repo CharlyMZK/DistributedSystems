@@ -1,4 +1,4 @@
-package src.main.java.messages;
+package main.java.messages;
 
 import org.json.JSONException;
 import org.json.JSONObject;
