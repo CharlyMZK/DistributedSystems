@@ -1,4 +1,4 @@
-package main.java.messages;
+package src.main.java.messages;
 import org.json.*;
 
 

@@ -1,4 +1,4 @@
-package main.java.messages;
+package src.main.java.messages;
 
 public enum ResponseState {
 	ACCEPTED, REFUSED, TIMEOUT;
