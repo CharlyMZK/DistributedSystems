@@ -1,4 +1,5 @@
-package client;
+package main.java.client;
+
 
 
 import java.io.*;
