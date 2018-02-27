@@ -75,9 +75,12 @@ public class BrokerService extends Thread{
 			   {
 				   iterator.remove();
 				   matchingRequestFound = true;
-				   //Add the two request to the history
-				   requestsHistory.add(currentRequest);
-				   requestsHistory.add(request);
+				   //Add the asks to the history
+				   if(request.getType() == Type.ASKS)
+					   requestsHistory.add(request);
+				   else
+					   requestsHistory.add(currentRequest);
+				   
 				   break;
 			   }
 			}
