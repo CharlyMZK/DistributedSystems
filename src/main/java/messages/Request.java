@@ -1,16 +1,35 @@
-
 package src.main.java.messages;
-import org.json.*;
 
+import java.rmi.server.UID;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Request {
-	String idClient, idRequest, stockName;
-	Types type;
-	Integer quantity;
-	Double price;
+	private String idClient;
+	private String idRequest;
+	private String stockName;
+	private Type type;
+	private Integer quantity;
+	private Double price;
+
+	public Request() {
+		super();
+	}
+
+	public Request generateRandomRequest(String idClient) {
+		Request request = new Request();
+
+		request.idClient = idClient;
+		request.idRequest = generateUID();
+		request.stockName = generateUID();
+		request.type =  Type.randomType();
+		request.quantity = ThreadLocalRandom.current().nextInt(0, 1000 + 1);
+		request.price = ThreadLocalRandom.current().nextDouble(0, 10000 + 1);
+
+		return request;
+	}
 
 	public JSONObject requestToJson() throws JSONException {
 		JSONObject request = new JSONObject();
@@ -32,11 +51,19 @@ public class Request {
 		request.idClient = jsonObject.getString("idClient");
 		request.idRequest = jsonObject.getString("idRequestion");
 		request.stockName = jsonObject.getString("stockName");
-		request.type = Types.valueOf(Types.class, jsonObject.getString("type"));
+		request.type = Type.valueOf(Type.class, jsonObject.getString("type"));
 		request.quantity = jsonObject.getInt("quantity");
 		request.price = jsonObject.getDouble("price");
 
 		return request;
+	}
+
+	private String generateUID() {
+		UID id = null;
+		for (int idx=0; idx<10; ++idx){
+			id = new UID();
+		}
+		return id.toString();
 	}
 
 	public String getIdClient() {
@@ -63,11 +90,11 @@ public class Request {
 		this.stockName = stockName;
 	}
 
-	public Types getType() {
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(Types type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
