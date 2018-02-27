@@ -17,7 +17,7 @@ public class UserInterface {
 	}
 
 	public void output(String out) {
-		System.out.print(out);
+		System.out.println(out);
 	}
 
 	@Override
