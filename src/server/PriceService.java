@@ -40,12 +40,13 @@ public class PriceService {
 		}
 	}
 
-	public List<String> get(int offset, int size) {
+	public List<String> history(int offset, int size) {
 		ArrayList<String> response = new ArrayList();
-
+		System.out.println("Offset : " + offset + " size : " + size + "history size : " + BrokerService.requestsHistory.size());
+		
 		if(offset < BrokerService.requestsHistory.size()) {
 			for(int i = offset; i < offset + size; i++) {
-				if(i > BrokerService.requestsHistory.size()) {
+				if(i + 1 > BrokerService.requestsHistory.size()) {
 					break;
 				}
 				response.add(BrokerService.requestsHistory.get(i).toString());
