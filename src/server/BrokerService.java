@@ -5,7 +5,9 @@ import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 
 import org.json.JSONException;
 
@@ -13,11 +15,13 @@ import src.messages.*;
 
 public class BrokerService extends Thread{
 	private Socket client;
-	private ArrayList<Request> requests;
+	private static List<Request> requests;
 
 	BrokerService(Socket client){
 		this.client = client;
-		requests = new ArrayList<Request>();
+		//We need a synchronized list because several thread can access the same list
+		if(requests == null)
+			requests = Collections.synchronizedList(new ArrayList<Request>());
 	}
 
 	@Override
@@ -56,15 +60,18 @@ public class BrokerService extends Thread{
 	{
 		Boolean matchingRequestFound = false;
 		Request currentRequest = Request.jsonToRequest(line);
-		Iterator<Request> iterator = requests.iterator();
-		while (iterator.hasNext()) {
-		   Request request = iterator.next(); // must be called before you can call i.remove()
-		   if(request.match(currentRequest))
-		   {
-			   iterator.remove();
-			   matchingRequestFound = true;
-			   break;
-		   }
+		synchronized (requests)
+		{
+			Iterator<Request> iterator = requests.iterator();
+			while (iterator.hasNext()) {
+			   Request request = iterator.next(); // must be called before you can call i.remove()
+			   if(request.match(currentRequest))
+			   {
+				   iterator.remove();
+				   matchingRequestFound = true;
+				   break;
+			   }
+			}
 		}
 		Response response = new Response();
 		if (matchingRequestFound)
