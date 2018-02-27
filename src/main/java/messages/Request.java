@@ -25,7 +25,7 @@ public class Request {
 		return request;
 	}
 
-	public Request jsonToRequest(String json) throws JSONException {
+	public static Request jsonToRequest(String json) throws JSONException {
 		JSONObject jsonObject = new JSONObject(json);
 		Request request = new Request();
 
