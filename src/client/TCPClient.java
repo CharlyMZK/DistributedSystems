@@ -61,15 +61,13 @@ public class TCPClient {
     boolean holdTheLine = true;          // Connection exists
     user.output(this.uId+" sending message \n");
     Request req = new Request();
-    req.generateRandomRequest(uId);
+    req = req.generateRandomRequest(uId);
     try {
-		req.requestToJson();
+		toServer.writeBytes(req.requestToJson().toString()+" \n");
 	} catch (JSONException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-    //toServer.writeByte(req.requestToJson().toString());
-    toServer.writeBytes("message \n");
     return true;
   }
 
