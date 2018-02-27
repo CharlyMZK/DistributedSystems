@@ -1,4 +1,4 @@
-package main.java.server;
+package src.main.java.server;
 
 // 22. 10. 10
 

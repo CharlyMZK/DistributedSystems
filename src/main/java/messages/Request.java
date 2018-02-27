@@ -1,8 +1,6 @@
 package src.main.java.messages;
 
-import java.io.IOException;
 import java.rmi.server.UID;
-import java.util.Arrays;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.json.JSONException;
@@ -53,7 +51,7 @@ public class Request {
 		request.idClient = jsonObject.getString("idClient");
 		request.idRequest = jsonObject.getString("idRequestion");
 		request.stockName = jsonObject.getString("stockName");
-		request.type = Types.valueOf(Types.class, jsonObject.getString("type"));
+		request.type = Type.valueOf(Type.class, jsonObject.getString("type"));
 		request.quantity = jsonObject.getInt("quantity");
 		request.price = jsonObject.getDouble("price");
 
@@ -92,11 +90,11 @@ public class Request {
 		this.stockName = stockName;
 	}
 
-	public Types getType() {
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(Types type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 
