@@ -8,6 +8,7 @@ public class Response {
 	public String idClient, idRequest;
 	public ResponseState responseState;
 	
+	//Return the json representation of the instance
 	public String responseToJson()
 	{
 		String message = ""; 
@@ -27,6 +28,7 @@ public class Response {
 		return message;
 	}
 	
+	//Create a response from a JSON string
 	public static Response jsonToResponse(String json) throws JSONException
 	{
 		Response response = new Response();

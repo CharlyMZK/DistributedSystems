@@ -47,6 +47,7 @@ public class BrokerService extends Thread{
 				} 
 				else 
 				{
+					//Handle the message and send the answer
 					Response response = handleMessage(line);
 					toClient.writeBytes(response.responseToJson() +'\n'); // Response
 				}	
@@ -65,13 +66,16 @@ public class BrokerService extends Thread{
 		Request currentRequest = Request.jsonToRequest(line);
 		synchronized (requests)
 		{
+			// itterate on each request to fin the first match
 			Iterator<Request> iterator = requests.iterator();
-			while (iterator.hasNext()) {
+			while (iterator.hasNext()) 
+			{
 			   Request request = iterator.next(); // must be called before you can call i.remove()
 			   if(request.match(currentRequest))
 			   {
 				   iterator.remove();
 				   matchingRequestFound = true;
+				   //Add the two request to the history
 				   requestsHistory.add(currentRequest);
 				   requestsHistory.add(request);
 				   break;
@@ -83,7 +87,6 @@ public class BrokerService extends Thread{
 			response.responseState = ResponseState.ACCEPTED;
 		else
 		{
-			//Answer no
 			requests.add(currentRequest);
 			response.responseState = ResponseState.TIMEOUT;
 		}
