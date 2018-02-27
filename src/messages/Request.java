@@ -31,36 +31,11 @@ public class Request {
 
 		return request;
 	}
-	
-	public Request generateRandomBuyRequest(String idClient) {
-		Request request = new Request();
 
-		request.idClient = idClient;
-		request.idRequest = generateUID();
-		request.stockName = StockName.APL;
-		request.type =  Type.BIDS;
-		request.quantity = 50;
-		request.price = (double) 50;
-
-		return request;
-	}
-	
-	public Request generateRandomSellRequest(String idClient) {
-		Request request = new Request();
-
-		request.idClient = idClient;
-		request.idRequest = generateUID();
-		request.stockName = StockName.APL;
-		request.type =  Type.ASKS;
-		request.quantity = 50;
-		request.price = (double) 50;
-
-		return request;
-	}
-
+	//Create a JSONObject representing the instance
 	public JSONObject requestToJson() throws JSONException {
 		JSONObject request = new JSONObject();
-
+		
 		request.put("idClient", idClient);
 		request.put("idRequest", idRequest);
 		request.put("stockName", stockName);
@@ -71,6 +46,7 @@ public class Request {
 		return request;
 	}
 
+	//Create a Request from a string json
 	public static Request jsonToRequest(String json) throws JSONException {
 		JSONObject jsonObject = new JSONObject(json);
 		Request request = new Request();
@@ -85,6 +61,7 @@ public class Request {
 		return request;
 	}
 	
+	//Return true if the instance and the request match
 	public Boolean match(Request request)
 	{
 		if(request.type == Type.ASKS && type == Type.BIDS)
@@ -98,6 +75,7 @@ public class Request {
 		return false;
 	}
 
+	//generate a UID
 	private String generateUID() {
 		UID id = null;
 		for (int idx=0; idx<10; ++idx){
@@ -155,4 +133,9 @@ public class Request {
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+
+	@Override
+	public String toString() {
+		return "Request [stockName=" + stockName + ", quantity=" + quantity + ", price=" + price + "]";
+	}	
 }

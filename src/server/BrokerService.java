@@ -16,7 +16,7 @@ import src.messages.*;
 public class BrokerService extends Thread{
 	private Socket client;
 	private static List<Request> requests;
-	private static List<Request> requestsHistory;
+	public static List<Request> requestsHistory;
 
 	BrokerService(Socket client){
 		this.client = client;
@@ -75,9 +75,12 @@ public class BrokerService extends Thread{
 			   {
 				   iterator.remove();
 				   matchingRequestFound = true;
-				   //Add the two request to the history
-				   requestsHistory.add(currentRequest);
-				   requestsHistory.add(request);
+				   //Add the asks to the history
+				   if(request.getType() == Type.ASKS)
+					   requestsHistory.add(request);
+				   else
+					   requestsHistory.add(currentRequest);
+				   
 				   break;
 			   }
 			}
