@@ -7,6 +7,8 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.json.JSONException;
+
 import src.messages.*;
 
 public class BrokerService extends Thread{
@@ -38,29 +40,7 @@ public class BrokerService extends Thread{
 				} 
 				else 
 				{
-					
-					Boolean matchingRequestFound = false;
-					Request currentRequest = Request.jsonToRequest(line);
-					Iterator<Request> iterator = requests.iterator();
-					while (iterator.hasNext()) {
-					   Request request = iterator.next(); // must be called before you can call i.remove()
-					   if(request.match(currentRequest))
-					   {
-						   iterator.remove();
-						   matchingRequestFound = true;
-						   break;
-					   }
-					}
-					Response response = new Response();
-					if (matchingRequestFound)
-						response.responseState = ResponseState.ACCEPTED;
-					else
-					{
-						//Answer no
-						requests.add(currentRequest);
-						response.responseState = ResponseState.TIMEOUT;
-					}
-					
+					Response response = handleMessage(line);
 					toClient.writeBytes(response.responseToJson() +'\n'); // Response
 				}	
 			}
@@ -70,5 +50,31 @@ public class BrokerService extends Thread{
 		}catch (Exception e){
 			System.out.println(e);
 		}
+	}
+	
+	private Response handleMessage(String line) throws JSONException
+	{
+		Boolean matchingRequestFound = false;
+		Request currentRequest = Request.jsonToRequest(line);
+		Iterator<Request> iterator = requests.iterator();
+		while (iterator.hasNext()) {
+		   Request request = iterator.next(); // must be called before you can call i.remove()
+		   if(request.match(currentRequest))
+		   {
+			   iterator.remove();
+			   matchingRequestFound = true;
+			   break;
+		   }
+		}
+		Response response = new Response();
+		if (matchingRequestFound)
+			response.responseState = ResponseState.ACCEPTED;
+		else
+		{
+			//Answer no
+			requests.add(currentRequest);
+			response.responseState = ResponseState.TIMEOUT;
+		}
+		return response;
 	}
 }
