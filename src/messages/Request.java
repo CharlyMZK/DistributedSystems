@@ -50,7 +50,7 @@ public class Request {
 		Request request = new Request();
 
 		request.idClient = jsonObject.getString("idClient");
-		request.idRequest = jsonObject.getString("idRequestion");
+		request.idRequest = jsonObject.getString("idRequest");
 		request.stockName = jsonObject.getString("stockName");
 		request.type = Type.valueOf(Type.class, jsonObject.getString("type"));
 		request.quantity = jsonObject.getInt("quantity");
