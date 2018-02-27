@@ -16,12 +16,15 @@ import src.messages.*;
 public class BrokerService extends Thread{
 	private Socket client;
 	private static List<Request> requests;
+	private static List<Request> requestsHistory;
 
 	BrokerService(Socket client){
 		this.client = client;
 		//We need a synchronized list because several thread can access the same list
 		if(requests == null)
 			requests = Collections.synchronizedList(new ArrayList<Request>());
+		if(requestsHistory == null)
+			requestsHistory = Collections.synchronizedList(new ArrayList<Request>());
 	}
 
 	@Override
@@ -69,6 +72,8 @@ public class BrokerService extends Thread{
 			   {
 				   iterator.remove();
 				   matchingRequestFound = true;
+				   requestsHistory.add(currentRequest);
+				   requestsHistory.add(request);
 				   break;
 			   }
 			}
