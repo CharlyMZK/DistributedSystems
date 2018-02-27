@@ -24,7 +24,7 @@ public class Request {
 
 		request.idClient = idClient;
 		request.idRequest = generateUID();
-		request.stockName = StockName.APL;
+		request.stockName = StockName.randomType();
 		request.type =  Type.randomType();
 		request.quantity = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
 		request.price = ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1;
