@@ -16,7 +16,7 @@ import src.messages.*;
 public class BrokerService extends Thread{
 	private Socket client;
 	private static List<Request> requests;
-	private static List<Request> requestsHistory;
+	public static List<Request> requestsHistory;
 
 	BrokerService(Socket client){
 		this.client = client;

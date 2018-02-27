@@ -133,4 +133,9 @@ public class Request {
 	public void setPrice(Double price) {
 		this.price = price;
 	}
+
+	@Override
+	public String toString() {
+		return "Request [stockName=" + stockName + ", quantity=" + quantity + ", price=" + price + "]";
+	}	
 }
