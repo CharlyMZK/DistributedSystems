@@ -3,6 +3,11 @@ package src.server;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import org.apache.xmlrpc.server.PropertyHandlerMapping;
+import org.apache.xmlrpc.server.XmlRpcServer;
+import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
+import org.apache.xmlrpc.webserver.WebServer;
+
 public class MultithreadedTCPServer {
 	private static int port = 9999;
 
@@ -10,6 +15,8 @@ public class MultithreadedTCPServer {
 		ServerSocket socket = new ServerSocket(port);
 
 		System.out.println("Multithreaded Server starts on Port " + port);
+		
+		new PriceService();
 
 		while (true){
 			Socket client = socket.accept();
