@@ -26,7 +26,9 @@ public class TraderService {
         }, 100,1000);
 	}
 	
-	public static void randomlyCreateTrader() throws UnknownHostException, IOException, InterruptedException {
+
+	
+	public static void createATraderThaSellThenBuy() throws UnknownHostException, IOException, InterruptedException {
 		
 			Thread t1 = new Thread(new Runnable() {
 			    public void run()
@@ -36,7 +38,7 @@ public class TraderService {
 						TraderService.clients.add(client);
 						System.out.println("New trader came up ! There is now  "+TraderService.clients.size()+" traders.");
 						try {
-							client.connectToServer();
+							client.connectToServerAndSellThenBuy();
 						} catch (IOException | InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -50,8 +52,33 @@ public class TraderService {
 		}
 	
 	
-	   public static void main(String[] args) throws UnknownHostException, IOException {
+	public static void randomlyCreateTrader() throws UnknownHostException, IOException, InterruptedException {
+		
+			Thread t1 = new Thread(new Runnable() {
+			    public void run()
+			    {
+			    	if(TraderService.clients.size() < 10) {
+			    		TCPClient client = new TCPClient();
+						TraderService.clients.add(client);
+						System.out.println("New trader came up ! There is now  "+TraderService.clients.size()+" traders.");
+						try {
+							client.connectToServerAndSendRequests();
+						} catch (IOException | InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			    	}else {
+			    		timer.cancel();
+			    		timer.purge();
+			    	}
+			    }});  
+			    t1.start();
+		}
+	
+	
+	   public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 	    	TraderService t = new TraderService();
-			t.scheduleTraderCreation();
+			t.createATraderThaSellThenBuy();
+	    	//t.randomlyCreateTrader();
 	    }
 }

@@ -31,6 +31,32 @@ public class Request {
 
 		return request;
 	}
+	
+	public Request generateRandomBuyRequest(String idClient) {
+		Request request = new Request();
+
+		request.idClient = idClient;
+		request.idRequest = generateUID();
+		request.stockName = generateUID();
+		request.type =  Type.BIDS;
+		request.quantity = 50;
+		request.price = (double) 50;
+
+		return request;
+	}
+	
+	public Request generateRandomSellRequest(String idClient) {
+		Request request = new Request();
+
+		request.idClient = idClient;
+		request.idRequest = generateUID();
+		request.stockName = generateUID();
+		request.type =  Type.ASKS;
+		request.quantity = 50;
+		request.price = (double) 50;
+
+		return request;
+	}
 
 	public JSONObject requestToJson() throws JSONException {
 		JSONObject request = new JSONObject();
