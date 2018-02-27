@@ -1,4 +1,4 @@
-package src.main.java.messages;
+package src.messages;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -1,8 +1,7 @@
-package src.main.java.server;
+package src.server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import src.main.java.messages.*;
 
 public class MultithreadedTCPServer {
 	private static int port = 9999;
@@ -15,7 +14,7 @@ public class MultithreadedTCPServer {
 		while (true){
 			Socket client = socket.accept();
 			System.out.println("Connection with: " + client.getRemoteSocketAddress());   // Output connection (Client) address
-			new EchoService(client).start();
+			new BrokerService(client).start();
 		}
 	}
 }

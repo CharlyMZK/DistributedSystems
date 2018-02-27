@@ -1,5 +1,5 @@
 
-package src.main.java.messages;
+package src.messages;
 import java.rmi.server.UID;
 import java.util.concurrent.ThreadLocalRandom;
 

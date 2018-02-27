@@ -1,4 +1,4 @@
-package src.main.java.server;
+package src.server;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -7,13 +7,13 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import src.main.java.messages.*;
+import src.messages.*;
 
-public class EchoService extends Thread{
+public class BrokerService extends Thread{
 	private Socket client;
 	private ArrayList<Request> requests;
 
-	EchoService(Socket client){
+	BrokerService(Socket client){
 		this.client = client;
 		requests = new ArrayList<Request>();
 	}

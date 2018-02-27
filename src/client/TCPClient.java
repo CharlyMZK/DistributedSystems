@@ -1,4 +1,4 @@
-package src.main.java.client;
+package src.client;
 
 /*
  * 22. 10. 10
@@ -18,7 +18,7 @@ import java.rmi.server.UID;
 
 import org.json.JSONException;
 
-import src.main.java.messages.Request;
+import src.messages.Request;
 
 public class TCPClient {
   public String uId;
@@ -68,8 +68,8 @@ public class TCPClient {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-    toServer.writeByte(req.requestToJson().toString());
-    //toServer.writeBytes("message \n");
+    //toServer.writeByte(req.requestToJson().toString());
+    toServer.writeBytes("message \n");
     return true;
   }
 

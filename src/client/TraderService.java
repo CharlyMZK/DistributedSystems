@@ -1,4 +1,4 @@
-package src.main.java.client;
+package src.client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class TraderManager {
+public class TraderService {
 	static ArrayList<TCPClient> clients = new ArrayList<>();
 	static Timer timer = new Timer();
 	
@@ -31,10 +31,10 @@ public class TraderManager {
 			Thread t1 = new Thread(new Runnable() {
 			    public void run()
 			    {
-			    	if(TraderManager.clients.size() < 10) {
+			    	if(TraderService.clients.size() < 10) {
 			    		TCPClient client = new TCPClient();
-						TraderManager.clients.add(client);
-						System.out.println("New trader came up ! There is now  "+TraderManager.clients.size()+" traders.");
+						TraderService.clients.add(client);
+						System.out.println("New trader came up ! There is now  "+TraderService.clients.size()+" traders.");
 						try {
 							client.connectToServer();
 						} catch (IOException | InterruptedException e) {
@@ -51,7 +51,7 @@ public class TraderManager {
 	
 	
 	   public static void main(String[] args) throws UnknownHostException, IOException {
-	    	TraderManager t = new TraderManager();
+	    	TraderService t = new TraderService();
 			t.scheduleTraderCreation();
 	    }
 }
