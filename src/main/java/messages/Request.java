@@ -6,6 +6,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class Request {
 	private String idClient;
 	private String idRequest;
@@ -56,6 +57,19 @@ public class Request {
 		request.price = jsonObject.getDouble("price");
 
 		return request;
+	}
+	
+	public Boolean match(Request request)
+	{
+		if(request.type == Type.ASKS && type == Type.BIDS)
+		{
+			return request.price <= price && request.quantity == quantity && request.stockName == stockName;
+		}
+		else if(type == Type.ASKS && request.type == Type.BIDS)
+		{
+			return request.price >= price && request.quantity == quantity && request.stockName == stockName;
+		}
+		return false;
 	}
 
 	private String generateUID() {

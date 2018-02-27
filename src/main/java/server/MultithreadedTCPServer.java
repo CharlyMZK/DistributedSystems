@@ -2,6 +2,7 @@ package src.main.java.server;
 
 import java.net.ServerSocket;
 import java.net.Socket;
+import src.main.java.messages.*;
 
 public class MultithreadedTCPServer {
 	private static int port = 9999;

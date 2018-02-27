@@ -38,12 +38,13 @@ public class EchoService extends Thread{
 				} 
 				else 
 				{
+					
 					Boolean matchingRequestFound = false;
 					Request currentRequest = Request.jsonToRequest(line);
 					Iterator<Request> iterator = requests.iterator();
 					while (iterator.hasNext()) {
 					   Request request = iterator.next(); // must be called before you can call i.remove()
-					   if(request.equals(currentRequest))
+					   if(request.match(currentRequest))
 					   {
 						   iterator.remove();
 						   matchingRequestFound = true;
