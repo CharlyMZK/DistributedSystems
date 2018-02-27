@@ -1,0 +1,57 @@
+package src.main.java.client;
+
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+public class TraderManager {
+	static ArrayList<TCPClient> clients = new ArrayList<>();
+	static Timer timer = new Timer();
+	
+	
+	public void scheduleTraderCreation() {
+	
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+					try {
+						randomlyCreateTrader();
+					} catch (IOException | InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            }
+        }, 100,1000);
+	}
+	
+	public static void randomlyCreateTrader() throws UnknownHostException, IOException, InterruptedException {
+		
+			Thread t1 = new Thread(new Runnable() {
+			    public void run()
+			    {
+			    	if(TraderManager.clients.size() < 10) {
+			    		TCPClient client = new TCPClient();
+						TraderManager.clients.add(client);
+						System.out.println("New trader came up ! There is now  "+TraderManager.clients.size()+" traders.");
+						try {
+							client.connectToServer();
+						} catch (IOException | InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+			    	}else {
+			    		timer.cancel();
+			    		timer.purge();
+			    	}
+			    }});  
+			    t1.start();
+		}
+	
+	
+	   public static void main(String[] args) throws UnknownHostException, IOException {
+	    	TraderManager t = new TraderManager();
+			t.scheduleTraderCreation();
+	    }
+}
