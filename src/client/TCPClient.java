@@ -21,36 +21,52 @@ import org.json.JSONException;
 import src.messages.Request;
 
 public class TCPClient {
-	private String uId;
+	private String uId;  									 // Unique client descriptor
+	public static UserInterface user = new UserInterface();  // User information displayer ( input & output ) 
 	public static Socket socket;
 	public static BufferedReader fromServer;
 	public static DataOutputStream toServer;
-	public static UserInterface user = new UserInterface();
+	
 
+	/**
+	 * TCPClient constructor
+	 */
 	public TCPClient() {
 		uId = TCPClient.generateUID();
 		System.out.println("Created a trader with uid : " + uId);
 	}
 
+	/**
+	 * Connect the client to server and start sending requests
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public void connectToServerAndSendRequests() throws UnknownHostException, IOException, InterruptedException {
 		socket = new Socket("localhost", 9999);
 		toServer = new DataOutputStream( // Datastream FROM Server
 				socket.getOutputStream());
 		fromServer = new BufferedReader( // Datastream TO Server
 				new InputStreamReader(socket.getInputStream()));
-		while (this.sendRequest()) { // Send requests while connected
+		while (this.generateAndsendRandomRequest()) { // Send requests while connected
 			Thread.sleep(5000);
 			receiveResponse(); // Process server's answer
 		}
 
+		// Closing socket and server
 		socket.close();
 		toServer.close();
 		fromServer.close();
 		System.out.println("Terminated");
 	}
 
-	private boolean sendRequest() throws IOException {
-		user.output("[ Trader " +this.uId + "] sending message \n");
+	/**
+	 * Generate a random JSON request and send it to server
+	 * @return
+	 * @throws IOException
+	 */
+	private boolean generateAndsendRandomRequest() throws IOException {
+		user.output("[ Trader " +this.uId + "] sending message");
 		String message = "";
 		Request req = new Request();
 		req = req.generateRandomRequest(uId);
@@ -59,18 +75,23 @@ public class TCPClient {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		
 		System.out.println("Client message : "+message);
-			toServer.writeBytes(message + " \n");
-		
+		toServer.writeBytes(message + " \n");	
 		return true;
 	}
 
-	
+	/**
+	 * Display the received response
+	 * @throws IOException
+	 */
 	private static void receiveResponse() throws IOException {
 		user.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 	}
 
+	/**
+	 * Generate a unique UID
+	 * @return
+	 */
 	public static String generateUID() {
 		UID id = null;
 		for (int idx = 0; idx < 10; ++idx) {
