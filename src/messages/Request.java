@@ -10,7 +10,7 @@ import org.json.JSONObject;
 public class Request {
 	private String idClient;
 	private String idRequest;
-	private String stockName;
+	private StockName stockName;
 	private Type type;
 	private Integer quantity;
 	private Double price;
@@ -24,10 +24,10 @@ public class Request {
 
 		request.idClient = idClient;
 		request.idRequest = generateUID();
-		request.stockName = generateUID();
+		request.stockName = StockName.APL;
 		request.type =  Type.randomType();
-		request.quantity = ThreadLocalRandom.current().nextInt(0, 1000 + 1);
-		request.price = ThreadLocalRandom.current().nextDouble(0, 10000 + 1);
+		request.quantity = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
+		request.price = ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1;
 
 		return request;
 	}
@@ -37,7 +37,7 @@ public class Request {
 
 		request.idClient = idClient;
 		request.idRequest = generateUID();
-		request.stockName = generateUID();
+		request.stockName = StockName.APL;
 		request.type =  Type.BIDS;
 		request.quantity = 50;
 		request.price = (double) 50;
@@ -50,7 +50,7 @@ public class Request {
 
 		request.idClient = idClient;
 		request.idRequest = generateUID();
-		request.stockName = generateUID();
+		request.stockName = StockName.APL;
 		request.type =  Type.ASKS;
 		request.quantity = 50;
 		request.price = (double) 50;
@@ -77,7 +77,7 @@ public class Request {
 
 		request.idClient = jsonObject.getString("idClient");
 		request.idRequest = jsonObject.getString("idRequest");
-		request.stockName = jsonObject.getString("stockName");
+		request.stockName = StockName.valueOf(StockName.class, jsonObject.getString("stockName"));
 		request.type = Type.valueOf(Type.class, jsonObject.getString("type"));
 		request.quantity = jsonObject.getInt("quantity");
 		request.price = jsonObject.getDouble("price");
@@ -122,11 +122,13 @@ public class Request {
 		this.idRequest = idRequest;
 	}
 
-	public String getStockName() {
+	
+
+	public StockName getStockName() {
 		return stockName;
 	}
 
-	public void setStockName(String stockName) {
+	public void setStockName(StockName stockName) {
 		this.stockName = stockName;
 	}
 
