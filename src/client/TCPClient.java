@@ -57,10 +57,14 @@ public class TCPClient {
 	      socket.getOutputStream());
 	    fromServer = new BufferedReader(     // Datastream TO Server
 	      new InputStreamReader(socket.getInputStream()));
-	    sendBuyRequest();
-	    receiveResponse();  
-	    sendSellRequest();
-	    receiveResponse();  
+	    if(sendBuyRequest()) {
+	    	receiveResponse();	
+	    }
+     if(sendSellRequest()) {
+    	 receiveResponse(); 	 
+     }
+	    
+	     
 	    socket.close();
 	    toServer.close();
 	    fromServer.close();
