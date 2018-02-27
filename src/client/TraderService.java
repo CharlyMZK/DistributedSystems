@@ -7,9 +7,13 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TraderService {
-	public static ArrayList<TCPClient> clients = new ArrayList<>();
-	public static Timer timer = new Timer();
+	public static ArrayList<TCPClient> clients = new ArrayList<>(); // List of requesting traders
+	public static Timer timer = new Timer();						// Timer creating traders
+	public static int traderCreationInterval = 1000;
 
+	/**
+	 * Set a timer who creates a trader every traderCreationInterval
+	 */
 	public void scheduleTraderCreation() {
 		timer.schedule(new TimerTask() {
 			@Override
@@ -20,17 +24,22 @@ public class TraderService {
 					e.printStackTrace();
 				}
 			}
-		}, 100, 1000);
+		}, 100, traderCreationInterval);
 	}
 
+	/**
+	 * Creates a trader who sends random requests
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public static void randomlyCreateTrader() throws UnknownHostException, IOException, InterruptedException {
-		Thread t1 = new Thread(new Runnable() {
+		Thread traderThread = new Thread(new Runnable() {
 			public void run() {
 				if (TraderService.clients.size() < 10) {
 					TCPClient client = new TCPClient();
 					TraderService.clients.add(client);
-					System.out.println(
-							"New trader came up ! There is now  " + TraderService.clients.size() + " traders.");
+					System.out.println("New trader created. There is now  " + TraderService.clients.size() + " traders.");
 					try {
 						client.connectToServerAndSendRequests();
 					} catch (IOException | InterruptedException e) {
@@ -42,10 +51,16 @@ public class TraderService {
 				}
 			}
 		});
-		t1.start();
+		traderThread.start();
 	}
 	
-
+	/**
+	 * Launch the traders creation
+	 * @param args
+	 * @throws UnknownHostException
+	 * @throws IOException
+	 * @throws InterruptedException
+	 */
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		TraderService t = new TraderService();
 		t.scheduleTraderCreation();
