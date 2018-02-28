@@ -48,9 +48,20 @@ public class BrokerService extends Thread{
 				} 
 				else 
 				{
-					//Handle the message and send the answer
-					Response response = handleMessage(line);
-					toClient.writeBytes(response.responseToJson() +'\n'); // Response
+					try {
+						//Handle the message and send the answer
+						Response response = handleMessage(line);
+						toClient.writeBytes(response.responseToJson() +'\n'); // Response
+					}
+					//If the message is malformed
+					catch(JSONException ex)
+					{
+						System.out.println(".....................THERE WAS AN ERROR IN THE JSON.................");
+						Response response = new Response();
+						response.setResponseState("REFUSED");
+						toClient.writeBytes(response.responseToJson() +'\n');
+					}
+
 				}	
 			}
 			fromClient.close(); toClient.close(); client.close(); // End
