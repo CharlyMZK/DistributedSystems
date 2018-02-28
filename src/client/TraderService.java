@@ -16,7 +16,7 @@ public class TraderService {
 	/**
 	 * Set a timer who creates a trader every traderCreationInterval
 	 */
-	public void scheduleTraderCreation() {
+	private void scheduleTraderCreation() {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
@@ -35,7 +35,7 @@ public class TraderService {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public static void randomlyCreateTrader() throws UnknownHostException, IOException, InterruptedException {
+	private static void randomlyCreateTrader() throws UnknownHostException, IOException, InterruptedException {
 		Thread traderThread = new Thread(new Runnable() {
 			public void run() {
 				if (TraderService.clients.size() < 10) {
@@ -57,6 +57,40 @@ public class TraderService {
 	}
 	
 	/**
+	 * Method to run a cyclic trader
+	 */
+	private static void runCyclicTrader() {
+		Thread traderThread = new Thread(new Runnable() {
+			public void run() {
+				ImprovedTrader cyclicTrader = new ImprovedTrader(true);
+				try {
+					cyclicTrader.run();
+				} catch (JMSException | IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		traderThread.start();
+	}
+	
+	/**
+	 * Method to run an acyclic trader
+	 */
+	private static void runAcyclicTrader() {
+		Thread traderThread = new Thread(new Runnable() {
+			public void run() {
+				ImprovedTrader acyclicTrader = new ImprovedTrader(false);
+				try {
+					acyclicTrader.run();
+				} catch (JMSException | IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		traderThread.start();
+	}
+	
+	/**
 	 * Launch the traders creation
 	 * @param args
 	 * @throws UnknownHostException
@@ -65,11 +99,9 @@ public class TraderService {
 	 * @throws JMSException 
 	 */
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException, JMSException {
-		TraderService t = new TraderService();
-		SmartTrader cyclicTrader = new SmartTrader(true);
-		SmartTrader acyclicTrader = new SmartTrader(false);
-		t.scheduleTraderCreation();
-		cyclicTrader.run();
-		acyclicTrader.run();
+		TraderService traderService = new TraderService();
+		traderService.scheduleTraderCreation();
+		runCyclicTrader();
+		runAcyclicTrader();
 	}
 }

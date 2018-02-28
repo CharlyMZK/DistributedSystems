@@ -26,6 +26,7 @@ public class Trader {
 
 	/**
 	 * Connect the client to server and start sending requests
+	 * 
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 * @throws InterruptedException
@@ -36,8 +37,8 @@ public class Trader {
 		fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Datastream TO Server
 		
 		while (this.generateAndsendRandomRequest()) { // Send requests while connected
-			Thread.sleep(5000);
 			receiveResponse(); // Process server's answer
+			Thread.sleep(5000);
 		}
 
 		// Closing socket and server
@@ -49,11 +50,12 @@ public class Trader {
 
 	/**
 	 * Generate a random JSON request and send it to server
-	 * @return
+	 * 
+	 * @return boolean
 	 * @throws IOException
 	 */
 	private boolean generateAndsendRandomRequest() throws IOException {
-		user.output("[ Trader " +this.uId + "] sending message");
+		user.output("[Trader " +this.uId + "] sending message");
 		String message = "";
 		Request req = new Request();
 		req = req.generateRandomRequest(uId);
@@ -69,6 +71,7 @@ public class Trader {
 
 	/**
 	 * Display the received response
+	 * 
 	 * @throws IOException
 	 */
 	private static void receiveResponse() throws IOException {
@@ -77,7 +80,8 @@ public class Trader {
 
 	/**
 	 * Generate a unique UID
-	 * @return
+	 * 
+	 * @return String
 	 */
 	public static String generateUID() {
 		UID id = null;
