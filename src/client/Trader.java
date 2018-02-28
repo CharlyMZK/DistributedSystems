@@ -1,80 +1,45 @@
 package src.client;
 
 import java.io.*;
-import java.net.*;
 import java.rmi.server.UID;
 
-import org.json.JSONException;
+import javax.jms.JMSException;
 
 import src.messages.Request;
 
-public class Trader {
-	private String uId;  									 // Unique client descriptor
-	public static UserInterface user = new UserInterface();  // User information displayer ( input & output ) 
-	public static Socket socket;
-	public static BufferedReader fromServer;
-	public static DataOutputStream toServer;
+public abstract class Trader {
+	protected String uId;  									 // Unique client descriptor
+	protected static UserInterface user = new UserInterface();  // User information displayer ( input & output ) 
 	
-
 	/**
-	 * TCPClient constructor
+	 * Function run allowing user to connect to server and make requests
 	 */
-	public Trader() {
-		uId = Trader.generateUID();
-		System.out.println("Created a trader with uid : " + uId);
-	}
-
+	protected abstract void trade() throws JMSException, IOException;
+	
 	/**
-	 * Connect the client to server and start sending requests
+	 * Send the request to the server
 	 * 
-	 * @throws UnknownHostException
-	 * @throws IOException
-	 * @throws InterruptedException
+	 * @param request Request to be send
+	 * @param toServer the server
 	 */
-	public void connectToServerAndSendRequests() throws UnknownHostException, IOException, InterruptedException {
-		socket = new Socket("localhost", 9999);
-		toServer = new DataOutputStream(socket.getOutputStream()); // Datastream FROM Server
-		fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Datastream TO Server
-		
-		while (this.generateAndsendRandomRequest()) { // Send requests while connected
-			receiveResponse(); // Process server's answer
-			Thread.sleep(5000);
-		}
-
-		// Closing socket and server
-		socket.close();
-		toServer.close();
-		fromServer.close();
-		System.out.println("Terminated");
-	}
-
-	/**
-	 * Generate a random JSON request and send it to server
-	 * 
-	 * @return boolean
-	 * @throws IOException
-	 */
-	private boolean generateAndsendRandomRequest() throws IOException {
-		user.output("[Trader " +this.uId + "] sending message");
-		String message = "";
-		Request req = new Request();
-		req = req.generateRandomRequest(uId);
+	protected void sendRequest(Request request, DataOutputStream toServer) {
+		String message;
 		try {
-			message = req.requestToJson().toString();
-		} catch (JSONException e) {
+			message = request.requestToJson().toString();
+			System.out.println("Client message : " + message);
+			toServer.writeBytes(message + " \n");	
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		System.out.println("Client message : "+message);
-		toServer.writeBytes(message + " \n");	
-		return true;
 	}
 
 	/**
 	 * Display the received response
 	 * 
+	 * @param fromServer message from the server
 	 * @throws IOException
 	 */
-	private static void receiveResponse() throws IOException {
+	protected void receiveResponse(BufferedReader fromServer) throws IOException {
 		user.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 	}
 
@@ -83,7 +48,7 @@ public class Trader {
 	 * 
 	 * @return String
 	 */
-	public static String generateUID() {
+	protected String generateUID() {
 		UID id = null;
 		for (int idx = 0; idx < 10; ++idx) {
 			id = new UID();

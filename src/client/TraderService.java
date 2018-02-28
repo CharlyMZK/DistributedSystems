@@ -5,11 +5,12 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.jms.JMSException;
 
 public class TraderService {
-	public static ArrayList<Trader> clients = new ArrayList<>(); // List of requesting traders
+	public static ArrayList<Trader> traders = new ArrayList<>(); // List of requesting traders
 	public static Timer timer = new Timer();						// Timer creating traders
 	public static int traderCreationInterval = 1000;
 
@@ -38,15 +39,27 @@ public class TraderService {
 	private static void randomlyCreateTrader() throws UnknownHostException, IOException, InterruptedException {
 		Thread traderThread = new Thread(new Runnable() {
 			public void run() {
-				if (TraderService.clients.size() < 10) {
-					Trader client = new Trader();
-					TraderService.clients.add(client);
-					System.out.println("New trader created. There is now  " + TraderService.clients.size() + " traders.");
-					try {
-						client.connectToServerAndSendRequests();
-					} catch (IOException | InterruptedException e) {
-						e.printStackTrace();
+				int traderType = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
+				if (TraderService.traders.size() < 10) {
+					Trader trader = null;
+					switch(traderType) {
+					case 0:
+						trader = new ZeroIQTrader();
+						break;
+					case 1:
+						trader = new ImprovedTrader(true);
+						break;
+					case 2 :
+						trader = new ImprovedTrader(false);
+						break;
 					}
+					TraderService.traders.add(trader);
+					System.out.println("New trader created. There is now  " + TraderService.traders.size() + " traders.");
+					try {
+						trader.trade();
+					} catch (JMSException | IOException e) {
+						e.printStackTrace();
+					} 
 				} else {
 					timer.cancel();
 					timer.purge();
@@ -55,41 +68,7 @@ public class TraderService {
 		});
 		traderThread.start();
 	}
-	
-	/**
-	 * Method to run a cyclic trader
-	 */
-	private static void runCyclicTrader() {
-		Thread traderThread = new Thread(new Runnable() {
-			public void run() {
-				ImprovedTrader cyclicTrader = new ImprovedTrader(true);
-				try {
-					cyclicTrader.run();
-				} catch (JMSException | IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		traderThread.start();
-	}
-	
-	/**
-	 * Method to run an acyclic trader
-	 */
-	private static void runAcyclicTrader() {
-		Thread traderThread = new Thread(new Runnable() {
-			public void run() {
-				ImprovedTrader acyclicTrader = new ImprovedTrader(false);
-				try {
-					acyclicTrader.run();
-				} catch (JMSException | IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		traderThread.start();
-	}
-	
+
 	/**
 	 * Launch the traders creation
 	 * @param args
@@ -101,7 +80,5 @@ public class TraderService {
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException, JMSException {
 		TraderService traderService = new TraderService();
 		traderService.scheduleTraderCreation();
-		runCyclicTrader();
-		runAcyclicTrader();
 	}
 }

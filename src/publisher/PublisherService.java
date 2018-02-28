@@ -10,7 +10,7 @@ import javax.jms.Session;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQTopic;
 
-public class PublisherServiceConnector {
+public class PublisherService {
 	private String user;
 	private String password;
 	private String host;
@@ -24,7 +24,7 @@ public class PublisherServiceConnector {
 	 * Constructor hydrating the connexion params
 	 * @param destinationParams
 	 */
-	public PublisherServiceConnector(String[] destinationParams) {
+	public PublisherService(String[] destinationParams) {
 		user = env("ACTIVEMQ_USER", "admin");
 		password = env("ACTIVEMQ_PASSWORD", "password");
 		host = env("ACTIVEMQ_HOST", "127.0.0.1");

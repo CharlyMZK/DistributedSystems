@@ -11,17 +11,17 @@ import javax.jms.TextMessage;
 
 import src.messages.StockName;
 
-class Publisher {
+class Journalist {
 	private Timer timer = new Timer(); // Timer used to time the requests send
 	private int publishMessageInterval; // The interval between two publish
 	private int publishingTimeInMs; // How long does the publisher will publish
 
 	public static void main(String[] args) throws JMSException {
 		// Connecting to publish service
-		PublisherServiceConnector publisherConnection = new PublisherServiceConnector(args);
+		PublisherService publisherConnection = new PublisherService(args);
 		publisherConnection.initConnexion();
 		// Creating a publisher and makes him publish
-		Publisher publisher = new Publisher(1000, 200000);
+		Journalist publisher = new Journalist(1000, 200000);
 		publisher.startPublish(publisherConnection);
 	}
 
@@ -31,7 +31,7 @@ class Publisher {
 	 * 
 	 * @param publisherConnection
 	 */
-	public void startPublish(PublisherServiceConnector publisherConnection) {
+	public void startPublish(PublisherService publisherConnection) {
 		// Getting connection params
 		Session session = publisherConnection.getSession();
 		MessageProducer producer = publisherConnection.getProducer();
@@ -69,7 +69,7 @@ class Publisher {
 	 * @param publishMessageInterval
 	 * @param publishingTimeInMs
 	 */
-	public Publisher(int publishMessageInterval, int publishingTimeInMs) {
+	public Journalist(int publishMessageInterval, int publishingTimeInMs) {
 		this.publishMessageInterval = publishMessageInterval;
 		this.publishingTimeInMs = publishingTimeInMs;
 	}
@@ -106,35 +106,6 @@ class Publisher {
 			news = makeBadRandomNews();
 		}
 		return news;
-	}
-
-	/**
-	 * Get an environment variable
-	 * 
-	 * @param key
-	 * @param defaultValue
-	 * @return env variable value
-	 */
-	private static String env(String key, String defaultValue) {
-		String rc = System.getenv(key);
-		if (rc == null)
-			return defaultValue;
-		return rc;
-	}
-
-	/**
-	 * Get args
-	 * 
-	 * @param args
-	 * @param index
-	 * @param defaultValue
-	 * @return arg get
-	 */
-	private static String arg(String[] args, int index, String defaultValue) {
-		if (index < args.length)
-			return args[index];
-		else
-			return defaultValue;
 	}
 
 	public Timer getTimer() {
