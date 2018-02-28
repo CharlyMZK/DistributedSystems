@@ -7,7 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class TraderService {
-	public static ArrayList<TCPClient> clients = new ArrayList<>(); // List of requesting traders
+	public static ArrayList<Trader> clients = new ArrayList<>(); // List of requesting traders
 	public static Timer timer = new Timer();						// Timer creating traders
 	public static int traderCreationInterval = 1000;
 
@@ -37,7 +37,7 @@ public class TraderService {
 		Thread traderThread = new Thread(new Runnable() {
 			public void run() {
 				if (TraderService.clients.size() < 10) {
-					TCPClient client = new TCPClient();
+					Trader client = new Trader();
 					TraderService.clients.add(client);
 					System.out.println("New trader created. There is now  " + TraderService.clients.size() + " traders.");
 					try {

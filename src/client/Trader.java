@@ -1,17 +1,5 @@
 package src.client;
 
-/*
- * 22. 10. 10
- */
-
-/**
- *
- * @author Peter Altenberd
- * (Translated into English by Ronald Moore)
- * Computer Science Dept.                   Fachbereich Informatik
- * Darmstadt Univ. of Applied Sciences      Hochschule Darmstadt
- */
-
 import java.io.*;
 import java.net.*;
 import java.rmi.server.UID;
@@ -20,7 +8,7 @@ import org.json.JSONException;
 
 import src.messages.Request;
 
-public class TCPClient {
+public class Trader {
 	private String uId;  									 // Unique client descriptor
 	public static UserInterface user = new UserInterface();  // User information displayer ( input & output ) 
 	public static Socket socket;
@@ -31,8 +19,8 @@ public class TCPClient {
 	/**
 	 * TCPClient constructor
 	 */
-	public TCPClient() {
-		uId = TCPClient.generateUID();
+	public Trader() {
+		uId = Trader.generateUID();
 		System.out.println("Created a trader with uid : " + uId);
 	}
 
@@ -44,10 +32,9 @@ public class TCPClient {
 	 */
 	public void connectToServerAndSendRequests() throws UnknownHostException, IOException, InterruptedException {
 		socket = new Socket("localhost", 9999);
-		toServer = new DataOutputStream( // Datastream FROM Server
-				socket.getOutputStream());
-		fromServer = new BufferedReader( // Datastream TO Server
-				new InputStreamReader(socket.getInputStream()));
+		toServer = new DataOutputStream(socket.getOutputStream()); // Datastream FROM Server
+		fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Datastream TO Server
+		
 		while (this.generateAndsendRandomRequest()) { // Send requests while connected
 			Thread.sleep(5000);
 			receiveResponse(); // Process server's answer
