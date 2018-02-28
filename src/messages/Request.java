@@ -4,6 +4,7 @@ import java.rmi.server.UID;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -89,16 +90,20 @@ public class Request {
 	 * @throws JSONException
 	 */
 	public static Request jsonToRequest(String json) throws JSONException {
-		JSONObject jsonObject = new JSONObject(json);
 		Request request = new Request();
-
-		request.idClient = jsonObject.getString("idClient");
-		request.idRequest = jsonObject.getString("idRequest");
-		request.stockName = StockName.valueOf(StockName.class, jsonObject.getString("stockName"));
-		request.type = Type.valueOf(Type.class, jsonObject.getString("type"));
-		request.quantity = jsonObject.getInt("quantity");
-		request.price = jsonObject.getDouble("price");
-
+		JSONObject jsonObject = null;
+		if(isJSONValid(json)) {
+			jsonObject = new JSONObject(json);
+			request.idClient = jsonObject.getString("idClient");
+			request.idRequest = jsonObject.getString("idRequest");
+			request.stockName = StockName.valueOf(StockName.class, jsonObject.getString("stockName"));
+			request.type = Type.valueOf(Type.class, jsonObject.getString("type"));
+			request.quantity = jsonObject.getInt("quantity");
+			request.price = jsonObject.getDouble("price");
+		}else {
+			System.out.println("Corrupted message");
+		}
+		
 		return request;
 	}
 
@@ -142,6 +147,26 @@ public class Request {
 			id = new UID();
 		}
 		return id.toString();
+	}
+	
+	/**
+	 * Check if the JSON received is valid
+	 * @param test
+	 * @return boolean
+	 */
+	public static boolean isJSONValid(String test) {
+	    try {
+	        new JSONObject(test);
+	    } catch (JSONException ex) {
+	        // edited, to include @Arthur's comment
+	        // e.g. in case JSONArray is valid as well...
+	        try {
+	            new JSONArray(test);
+	        } catch (JSONException ex1) {
+	            return false;
+	        }
+	    }
+	    return true;
 	}
 
 	public String getIdClient() {
