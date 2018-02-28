@@ -87,7 +87,12 @@ public class Request {
 		}
 		return false;
 	}
-
+	
+	//Return the request formated to fit in a csv file
+	public String toCsvString()
+	{
+		return stockName + ";" + quantity + ";" + price + "\n";
+	}
 	//generate a UID
 	private static String generateUID() {
 		UID id = null;

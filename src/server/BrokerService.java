@@ -2,6 +2,7 @@ package src.server;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.util.ArrayList;
@@ -76,10 +77,30 @@ public class BrokerService extends Thread{
 				   iterator.remove();
 				   matchingRequestFound = true;
 				   //Add the asks to the history
-				   if(request.getType() == Type.ASKS)
-					   requestsHistory.add(request);
-				   else
-					   requestsHistory.add(currentRequest);
+				   try 
+				   {
+					   //Write in log and in history
+					   FileWriter writer = new FileWriter("log.csv",true);
+					   if(request.getType() == Type.ASKS)
+					   {
+						   requestsHistory.add(request);
+						   writer.append(request.toCsvString());
+					   }   
+					   else
+					   {
+						   requestsHistory.add(currentRequest);
+						   writer.append(currentRequest.toCsvString());
+					   }
+					   writer.flush();
+					   writer.close();
+					   
+				   }
+				   catch(Exception ex)
+				   {
+					   ex.printStackTrace();
+				   }
+
+
 				   
 				   break;
 			   }
