@@ -19,6 +19,8 @@ package src.publisher;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQTopic;
 
+import src.messages.StockName;
+
 import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,72 +30,85 @@ import javax.jms.*;
 class Publisher {
 	public static Timer timer = new Timer();
 	public static int publishMessageInterval = 1000;
-	
-    public static void main(String []args) throws JMSException {
+	public static int publishingTimeInMs = 200000;
 
-        String user = env("ACTIVEMQ_USER", "admin");
-        String password = env("ACTIVEMQ_PASSWORD", "password");
-        String host = env("ACTIVEMQ_HOST", "localhost");
-        int port = Integer.parseInt(env("ACTIVEMQ_PORT", "61616"));
-        String destination = arg(args, 0, "event");
+	public static void main(String[] args) throws JMSException {
 
-        int messages = 10000;
-        int size = 256;
+		String user = env("ACTIVEMQ_USER", "admin");
+		String password = env("ACTIVEMQ_PASSWORD", "password");
+		String host = env("ACTIVEMQ_HOST", "localhost");
+		int port = Integer.parseInt(env("ACTIVEMQ_PORT", "61616"));
+		String destination = arg(args, 0, "event");
 
-        String DATA = "abcdefghijklmnopqrstuvwxyz";
-        String body = "";
-        for( int i=0; i < size; i ++) {
-            body += DATA.charAt(i%DATA.length());
-        }
+		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + host + ":" + port);
 
-        ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + host + ":" + port);
-
-        Connection connection = factory.createConnection(user, password);
-        connection.start();
-        Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-        Destination dest = new ActiveMQTopic(destination);
-        MessageProducer producer = session.createProducer(dest);
-        producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-
-        /*timer.schedule(new TimerTask() {
+		Connection connection = factory.createConnection(user, password);
+		connection.start();
+		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+		Destination dest = new ActiveMQTopic(destination);
+		MessageProducer producer = session.createProducer(dest);
+		producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+		long startTime = System.currentTimeMillis();
+		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try {
-					 TextMessage msg = session.createTextMessage(body);
-			          msg.setIntProperty("id", i);
-			          producer.send(msg);
-				} catch (IOException | InterruptedException e) {
+					int randomInt = (Math.random() <= 0.5) ? 1 : 2;
+					String body = "";
+					if (randomInt == 1) {
+						body = makeGoodRandomNews();
+					} else {
+						body = makeBadRandomNews();
+					}
+					TextMessage msg = session.createTextMessage(body);
+					msg.setIntProperty("id", 1);
+					producer.send(msg);
+					System.out.println("Sending, " + body);
+				} catch (JMSException e) {
 					e.printStackTrace();
 				}
+
+				long executionTime = System.currentTimeMillis();
+				long duration = (executionTime - startTime); // divide by 1000000 to get milliseconds.
+
+				if (duration > publishingTimeInMs) {
+					timer.cancel();
+					timer.purge();
+					try {
+						producer.send(session.createTextMessage("SHUTDOWN"));
+					} catch (JMSException e) {
+						e.printStackTrace();
+					}
+					try {
+						connection.close();
+					} catch (JMSException e) {
+						e.printStackTrace();
+					}
+				}
 			}
-		}, 100, publishMessageInterval);*/
-        
-        for( int i=1; i <= messages; i ++) {
-            TextMessage msg = session.createTextMessage(body);
-            msg.setIntProperty("id", i);
-            producer.send(msg);
-            if( (i % 1000) == 0) {
-                System.out.println(String.format("Sent %d messages", i));
-            }
-        }
+		}, 100, publishMessageInterval);
+	}
 
-        producer.send(session.createTextMessage("SHUTDOWN"));
-        connection.close();
+	private static String makeGoodRandomNews() {
+		return "Good news about " + StockName.randomType();
+	}
 
-    }
+	private static String makeBadRandomNews() {
+		return "Good bad about " + StockName.randomType();
+	}
 
-    private static String env(String key, String defaultValue) {
-        String rc = System.getenv(key);
-        if( rc== null )
-            return defaultValue;
-        return rc;
-    }
+	private static String env(String key, String defaultValue) {
+		String rc = System.getenv(key);
+		if (rc == null)
+			return defaultValue;
+		return rc;
+	}
 
-    private static String arg(String []args, int index, String defaultValue) {
-        if( index < args.length )
-            return args[index];
-        else
-            return defaultValue;
-    }
+	private static String arg(String[] args, int index, String defaultValue) {
+		if (index < args.length)
+			return args[index];
+		else
+			return defaultValue;
+	}
 
 }
