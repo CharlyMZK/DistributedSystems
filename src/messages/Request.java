@@ -31,6 +31,19 @@ public class Request {
 
 		return request;
 	}
+	
+	public static Request generateRandomImprovedRequest(String idClient, StockName stockName, Type type) {
+		Request request = new Request();
+
+		request.idClient = idClient;
+		request.idRequest = generateUID();
+		request.stockName = stockName;
+		request.type =  type;
+		request.quantity = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
+		request.price = ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1;
+
+		return request;
+	}
 
 	//Create a JSONObject representing the instance
 	public JSONObject requestToJson() throws JSONException {
@@ -81,7 +94,7 @@ public class Request {
 		return stockName + ";" + quantity + ";" + price + "\n";
 	}
 	//generate a UID
-	private String generateUID() {
+	private static String generateUID() {
 		UID id = null;
 		for (int idx=0; idx<10; ++idx){
 			id = new UID();
