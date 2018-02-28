@@ -12,8 +12,7 @@ import java.net.Socket;
 
 import javax.jms.*;
 
-class ImprovedTrader {
-	private String uId;
+class ImprovedTrader extends Trader{
 	private boolean isCyclic;
 
 	/**
@@ -21,16 +20,12 @@ class ImprovedTrader {
 	 * @param isCyclic True if the Trader is cyclic
 	 */
 	public ImprovedTrader(boolean isCyclic) {
-		this.uId = Trader.generateUID();
+		this.uId = generateUID();
 		this.isCyclic = isCyclic;
-		if(isCyclic) {
+		if(isCyclic)
 			this.uId = this.uId + " | Cyclic";
-			System.out.println("Created a cyclic trader with uid : " + this.uId);
-		} else {
+		else
 			this.uId = this.uId + " | Acyclic";
-			System.out.println("Created an acyclic trader with uid : " + this.uId);
-		}
-
 	}
 
 	/**
@@ -41,7 +36,6 @@ class ImprovedTrader {
 	 */
 	public void run() throws JMSException, IOException {
 		ImprovedTraderListener improvedTraderListener = new ImprovedTraderListener();
-		UserInterface userInterface = new UserInterface();
 		Socket socket;
 		BufferedReader fromServer;
 		DataOutputStream toServer;
@@ -59,11 +53,11 @@ class ImprovedTrader {
 				String body = ((TextMessage) msg).getText();
 				String[] news = body.split(" ");
 				if("Good".equals(news[0])) { // Good news 
-					treatGoodNews(news, userInterface, fromServer, toServer);
+					treatGoodNews(news, fromServer, toServer);
 				} else if ("Bad".equals(news[0])) { // Bad news
-					treatBadNews(news, userInterface, fromServer, toServer);
+					treatBadNews(news, fromServer, toServer);
 				} else if("SHUTDOWN".equals(body)) { // Shutdown message
-					userInterface.output("[Trader " + this.uId + "] quit");
+					user.output("[Trader " + this.uId + "] quit");
 					break;
 				}
 			} else {
@@ -82,36 +76,34 @@ class ImprovedTrader {
 	 * Treat the good news and display the result
 	 * 
 	 * @param news News to be used
-	 * @param userInterface User interface
 	 * @param fromServer Message from server
 	 * @param toServer Message for server
 	 * @throws IOException 
 	 */
-	private void treatGoodNews(String[] news, UserInterface userInterface, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
-		userInterface.output("[Trader " + this.uId + "] sending message");
+	private void treatGoodNews(String[] news, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
+		user.output("[Trader " + this.uId + "] sending message");
 		if(this.isCyclic)
 			makeBuyRequest(news[news.length-1], toServer);
 		else
 			makeSellRequest(news[news.length-1], toServer);
-		userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
+		receiveResponse(fromServer);
 	}
 
 	/**
 	 * Treat the good news and display the result
 	 * 
 	 * @param news News to be used
-	 * @param userInterface User interface
 	 * @param fromServer Message from server
 	 * @param toServer Message for server
 	 * @throws IOException 
 	 */
-	private void treatBadNews(String[] news, UserInterface userInterface, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
-		userInterface.output("[Trader " + this.uId + "] sending message");
+	private void treatBadNews(String[] news, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
+		user.output("[Trader " + this.uId + "] sending message");
 		if(this.isCyclic)
 			makeSellRequest(news[news.length-1], toServer);
 		else
 			makeBuyRequest(news[news.length-1], toServer);
-		userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
+		receiveResponse(fromServer);
 	}
 
 	/**
@@ -124,7 +116,7 @@ class ImprovedTrader {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
 			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
-			sendrequest(request, toServer);
+			sendRequest(request, toServer);
 		}
 	}
 
@@ -138,24 +130,7 @@ class ImprovedTrader {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
 			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.ASKS);
-			sendrequest(request, toServer);
-		}
-	}
-
-	/**
-	 * Send the request to the server
-	 * 
-	 * @param request Request to be send
-	 * @param toServer the server
-	 */
-	private static void sendrequest(Request request, DataOutputStream toServer) {
-		String message;
-		try {
-			message = request.requestToJson().toString();
-			System.out.println("Client message : " + message);
-			toServer.writeBytes(message + " \n");	
-		} catch (Exception e) {
-			e.printStackTrace();
+			sendRequest(request, toServer);
 		}
 	}
 }
