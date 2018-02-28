@@ -14,15 +14,20 @@ import java.net.Socket;
 
 import javax.jms.*;
 
-class CyclicTrader {
-	private static String uId;
+class SmartTrader {
+	private String uId;
+	private boolean isCyclic;
 	
-	public CyclicTrader() {
-		uId = Trader.generateUID();
-		System.out.println("Created a trader with uid : " + uId);
+	public SmartTrader(boolean isCyclic) {
+		this.uId = Trader.generateUID();
+		this.isCyclic = isCyclic;
+		if(isCyclic)
+			System.out.println("Created a cyclic trader with uid : " + this.uId);
+		else 
+			System.out.println("Created an acyclic trader with uid : " + this.uId);
 	}
 
-	public static void run() throws JMSException, IOException {
+	public void run() throws JMSException, IOException {
 		String user = env("ACTIVEMQ_USER", "admin");
 		String password = env("ACTIVEMQ_PASSWORD", "password");
 		String host = env("ACTIVEMQ_HOST", "127.0.0.1");
@@ -54,10 +59,16 @@ class CyclicTrader {
 				String body = ((TextMessage) msg).getText();
 				String[] news = body.split(" ");
 				if("Good".equals(news[0])) {
-					makeBuyRequest(news[news.length-1], toServer);
+					if(isCyclic)
+						makeBuyRequest(news[news.length-1], toServer);
+					else
+						makeSellRequest(news[news.length-1], toServer);
 					userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 				} else if ("Bad".equals(news[0])) {
-					makeSellRequest(news[news.length-1], toServer);
+					if(isCyclic)
+						makeSellRequest(news[news.length-1], toServer);
+					else
+						makeBuyRequest(news[news.length-1], toServer);
 					userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 				} else if("SHUTDOWN".equals(body)) {
 					long diff = System.currentTimeMillis() - start;
@@ -81,19 +92,19 @@ class CyclicTrader {
 		return rc;
 	}
 	
-	private static void makeBuyRequest(String stockName, DataOutputStream toServer) {
+	private void makeBuyRequest(String stockName, DataOutputStream toServer) {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
-			Request request = Request.generateRandomImprovedRequest(uId, stock, Type.BIDS);
+			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
 			sendrequest(request, toServer);
 			System.out.println("Buying " + stockName);
 		}
 	}
 	
-	private static void makeSellRequest(String stockName, DataOutputStream toServer) {
+	private void makeSellRequest(String stockName, DataOutputStream toServer) {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
-			Request request = Request.generateRandomImprovedRequest(uId, stock, Type.BIDS);
+			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
 			sendrequest(request, toServer);
 			System.out.println("Selling " + stockName);
 		}

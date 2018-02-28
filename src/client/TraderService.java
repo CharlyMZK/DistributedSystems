@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.jms.JMSException;
+
 public class TraderService {
 	public static ArrayList<Trader> clients = new ArrayList<>(); // List of requesting traders
 	public static Timer timer = new Timer();						// Timer creating traders
@@ -60,10 +62,14 @@ public class TraderService {
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 * @throws InterruptedException
+	 * @throws JMSException 
 	 */
-	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
+	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException, JMSException {
 		TraderService t = new TraderService();
+		SmartTrader cyclicTrader = new SmartTrader(true);
+		SmartTrader acyclicTrader = new SmartTrader(false);
 		t.scheduleTraderCreation();
-		CyclicTrader cyclicTrader = new CyclicTrader();
+		cyclicTrader.run();
+		acyclicTrader.run();
 	}
 }
