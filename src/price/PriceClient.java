@@ -36,7 +36,7 @@ public class PriceClient {
 		
 		// First create param with offset and size
 		Object[] params = new Object[]{new Integer(offset), new Integer(size)};
-		System.out.println("About to get available stock from " + params[0] 
+		System.out.println("About to get available " + method + " from " + params[0] 
 				+ " with size " + params[1] + "." );
 		
 		try {
