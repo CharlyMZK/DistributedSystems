@@ -18,29 +18,34 @@ public class PriceClient {
 	private static int size = 4;
 
 	public static void main(String[] args) throws Exception {
-
+		
+		// We configure the client
 		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 
 		config.setServerURL(new URL("http://" + host + ":" + port + "/xmlrpc"));
 		XmlRpcClient client = new XmlRpcClient();
 		client.setConfig(config);
 		
-		getAvailableStock(client, 0);
-		getHistory(client, 0);
+		// Call function with an offset of 0
+		getFromServer(client, 0, "stocks");
+		getFromServer(client, 0, "history");
 
 	}
 	
-	public static void getAvailableStock(XmlRpcClient client, int offset) {
+	public static void getFromServer(XmlRpcClient client, int offset, String method) {
+		
+		// First create param with offset and size
 		Object[] params = new Object[]{new Integer(offset), new Integer(size)};
-		System.out.println("About to get available stock from " + params[0] 
+		System.out.println("About to get available " + method + " from " + params[0] 
 				+ " with size " + params[1] + "." );
 		
 		try {
-			List<String> result = decodeList(client.execute("Price.stocks", params));
-			printHistory(result);
+			List<String> result = decodeList(client.execute("Price." + method, params));
+			printResult(result);
 			
+			// While result size is equal to size we call this function again with offset + size
 			if(result.size() == size)
-				getAvailableStock(client, offset + size);
+				getFromServer(client, offset + size, method);
 			else 
 				System.out.println("Get all stocks\n");
 			
@@ -50,26 +55,7 @@ public class PriceClient {
 		}
 	}
 
-	public static void getHistory(XmlRpcClient client, int offset) {
-		Object[] params = new Object[]{new Integer(offset), new Integer(size)};
-		System.out.println("About to get stock history from " + params[0] 
-				+ " with size " + params[1] + "." );
-
-		try {
-			List<String> result = decodeList(client.execute("Price.history", params));
-			printHistory(result);
-
-			if(result.size() == size)
-				getHistory(client, offset + size);
-			else
-				System.out.println("End of history");
-		}
-		catch (XmlRpcException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public static void printHistory(List<String> history) {
+	public static void printResult(List<String> history) {
 		for (Iterator<String> i = history.iterator(); i.hasNext();) {
 			String item = i.next();
 			System.out.println(item);

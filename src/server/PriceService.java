@@ -41,6 +41,12 @@ public class PriceService {
 		}
 	}
 
+	/**
+	 *  Function that retrieve actual stock
+	 * @param offset
+	 * @param size
+	 * @return
+	 */
 	public List<String> stocks(int offset, int size) {
 		ArrayList<String> response = new ArrayList();
 		System.out.println("Offset : " + offset + " size : " + size);
@@ -59,9 +65,15 @@ public class PriceService {
 		return response;
 	}
 
+	/**
+	 * Function that retrieve history of sold stock
+	 * @param offset
+	 * @param size
+	 * @return
+	 */
 	public List<String> history(int offset, int size) {
 		ArrayList<String> response = new ArrayList();
-		System.out.println("Offset : " + offset + " size : " + size + "history size : " + BrokerService.getHistoryRequests().size());
+		System.out.println("Offset : " + offset + " size : " + size + " history size : " + BrokerService.getHistoryRequests().size());
 
 		if(offset < BrokerService.getHistoryRequests().size()) {
 			for(int i = offset; i < offset + size; i++) {
