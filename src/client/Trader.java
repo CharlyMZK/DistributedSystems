@@ -26,6 +26,7 @@ public class Trader {
 
 	/**
 	 * Connect the client to server and start sending requests
+	 * 
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 * @throws InterruptedException
@@ -49,7 +50,8 @@ public class Trader {
 
 	/**
 	 * Generate a random JSON request and send it to server
-	 * @return
+	 * 
+	 * @return boolean
 	 * @throws IOException
 	 */
 	private boolean generateAndsendRandomRequest() throws IOException {
@@ -69,6 +71,7 @@ public class Trader {
 
 	/**
 	 * Display the received response
+	 * 
 	 * @throws IOException
 	 */
 	private static void receiveResponse() throws IOException {
@@ -77,7 +80,8 @@ public class Trader {
 
 	/**
 	 * Generate a unique UID
-	 * @return
+	 * 
+	 * @return String
 	 */
 	public static String generateUID() {
 		UID id = null;

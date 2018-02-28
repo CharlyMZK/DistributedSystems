@@ -16,10 +16,18 @@ public class Request {
 	private Integer quantity;
 	private Double price;
 
+	/**
+	 * Empty constructor
+	 */
 	public Request() {
-		super();
 	}
-
+	
+	/**
+	 * Generate a random request
+	 * 
+	 * @param idClient id of the client
+ 	 * @return Request
+	 */
 	public Request generateRandomRequest(String idClient) {
 		Request request = new Request();
 
@@ -32,7 +40,15 @@ public class Request {
 
 		return request;
 	}
-
+	
+	/**
+	 * Generate a random request for smart traders
+	 * 
+	 * @param idClient id of the client
+	 * @param stockName name of the stock
+	 * @param type type of the request
+	 * @return Request
+	 */
 	public static Request generateRandomImprovedRequest(String idClient, StockName stockName, Type type) {
 		Request request = new Request();
 
@@ -46,7 +62,12 @@ public class Request {
 		return request;
 	}
 
-	//Create a JSONObject representing the instance
+	/**
+	 * Create a JSONObject representing the instance
+	 * 
+	 * @return JSONObject
+	 * @throws JSONException
+	 */
 	public JSONObject requestToJson() throws JSONException {
 		JSONObject request = new JSONObject();
 
@@ -60,7 +81,13 @@ public class Request {
 		return request;
 	}
 
-	//Create a Request from a string json
+	/**
+	 * Create a Request from a string json
+	 * 
+	 * @param json String json
+	 * @return Request
+	 * @throws JSONException
+	 */
 	public static Request jsonToRequest(String json) throws JSONException {
 		JSONObject jsonObject = new JSONObject(json);
 		Request request = new Request();
@@ -75,7 +102,12 @@ public class Request {
 		return request;
 	}
 
-	//Return true if the instance and the request match
+	/**
+	 * Check if a bid match an ask
+	 * 
+	 * @param request Request to be match
+	 * @return true if the instance and the request match
+	 */
 	public Boolean match(Request request)
 	{
 		if(request.type == Type.ASKS && type == Type.BIDS)
@@ -89,12 +121,21 @@ public class Request {
 		return false;
 	}
 
-	//Return the request formated to fit in a csv file
+	/**
+	 * Return the request formated to fit in a csv file
+	 * 
+	 * @return String 
+	 */
 	public String toCsvString()
 	{
 		return stockName + ";" + quantity + ";" + price + "\n";
 	}
-	//generate a UID
+	
+	/**
+	 * generate a UID
+	 * 
+	 * @return String UID
+	 */
 	private static String generateUID() {
 		UID id = null;
 		for (int idx=0; idx<10; ++idx){
@@ -118,8 +159,6 @@ public class Request {
 	public void setIdRequest(String idRequest) {
 		this.idRequest = idRequest;
 	}
-
-
 
 	public StockName getStockName() {
 		return stockName;
