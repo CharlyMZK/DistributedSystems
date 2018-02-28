@@ -1,6 +1,7 @@
 
 package src.messages;
 import java.rmi.server.UID;
+import java.text.DecimalFormat;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.json.JSONException;
@@ -154,6 +155,6 @@ public class Request {
 
 	@Override
 	public String toString() {
-		return "Request [stockName=" + stockName + ", quantity=" + quantity + ", price=" + price + "]";
+		return stockName + " sell " + quantity + " at " + new DecimalFormat("#.##").format(price) + " $";
 	}	
 }
