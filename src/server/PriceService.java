@@ -10,6 +10,7 @@ import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 import src.messages.Request;
+import src.messages.Type;
 
 public class PriceService {
 
@@ -40,19 +41,37 @@ public class PriceService {
 		}
 	}
 
-	public List<String> history(int offset, int size) {
+	public List<String> stocks(int offset, int size) {
 		ArrayList<String> response = new ArrayList();
-		System.out.println("Offset : " + offset + " size : " + size + "history size : " + BrokerService.requestsHistory.size());
-		
-		if(offset < BrokerService.requestsHistory.size()) {
+		System.out.println("Offset : " + offset + " size : " + size);
+
+		if(offset < BrokerService.getRequests().size()) {
 			for(int i = offset; i < offset + size; i++) {
-				if(i + 1 > BrokerService.requestsHistory.size()) {
+				if(i + 1 > BrokerService.getRequests().size()) {
 					break;
 				}
-				response.add(BrokerService.requestsHistory.get(i).toString());
+
+				if(BrokerService.getRequests().get(i).getType() == Type.ASKS)
+					response.add(BrokerService.getRequests().get(i).toString());
 			}
 		}
-		
+
+		return response;
+	}
+
+	public List<String> history(int offset, int size) {
+		ArrayList<String> response = new ArrayList();
+		System.out.println("Offset : " + offset + " size : " + size + "history size : " + BrokerService.getHistoryRequests().size());
+
+		if(offset < BrokerService.getHistoryRequests().size()) {
+			for(int i = offset; i < offset + size; i++) {
+				if(i + 1 > BrokerService.getHistoryRequests().size()) {
+					break;
+				}
+				response.add(BrokerService.getHistoryRequests().get(i).toString());
+			}
+		}
+
 		return response;
 	}
 }
