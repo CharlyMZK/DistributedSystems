@@ -25,7 +25,7 @@ class cyclicTrader {
 	public static void main(String []args) throws JMSException, IOException {
 		String user = env("ACTIVEMQ_USER", "admin");
 		String password = env("ACTIVEMQ_PASSWORD", "password");
-		String host = env("ACTIVEMQ_HOST", "locahost");
+		String host = env("ACTIVEMQ_HOST", "127.0.0.1");
 		int port = Integer.parseInt(env("ACTIVEMQ_PORT", "61616"));
 		String destination = arg(args, 0, "event");
 

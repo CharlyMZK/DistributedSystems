@@ -16,38 +16,34 @@
  */
 package src.publisher;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQTopic;
-
-import src.messages.StockName;
-
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import src.messages.StockName;
 
 class Publisher {
-	public static Timer timer = new Timer();
-	public static int publishMessageInterval = 1000;
-	public static int publishingTimeInMs = 200000;
+	private Timer timer = new Timer();
+	private int publishMessageInterval;
+	private int publishingTimeInMs;
 
 	public static void main(String[] args) throws JMSException {
+		PublisherServiceConnector publisherConnection = new PublisherServiceConnector(args);
+		publisherConnection.initConnexion();
+		Publisher publisher = new Publisher(1000,200000);
+		publisher.startPublish(publisherConnection);
+	}
 
-		String user = env("ACTIVEMQ_USER", "admin");
-		String password = env("ACTIVEMQ_PASSWORD", "password");
-		String host = env("ACTIVEMQ_HOST", "localhost");
-		int port = Integer.parseInt(env("ACTIVEMQ_PORT", "61616"));
-		String destination = arg(args, 0, "event");
-
-		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + host + ":" + port);
-
-		Connection connection = factory.createConnection(user, password);
-		connection.start();
-		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Destination dest = new ActiveMQTopic(destination);
-		MessageProducer producer = session.createProducer(dest);
-		producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+	public void startPublish(PublisherServiceConnector publisherConnection) {
+		Session session = publisherConnection.getSession();
+		MessageProducer producer = publisherConnection.getProducer();
+		Connection connection = publisherConnection.getConnection();
+		
 		long startTime = System.currentTimeMillis();
 		timer.schedule(new TimerTask() {
 			@Override
@@ -61,7 +57,6 @@ class Publisher {
 						body = makeBadRandomNews();
 					}
 					TextMessage msg = session.createTextMessage(body);
-					msg.setIntProperty("id", 1);
 					producer.send(msg);
 					System.out.println("Sending, " + body);
 				} catch (JMSException e) {
@@ -88,13 +83,19 @@ class Publisher {
 			}
 		}, 100, publishMessageInterval);
 	}
+	
+	
+	public Publisher(int publishMessageInterval, int publishingTimeInMs) {
+		this.publishMessageInterval = publishMessageInterval;
+		this.publishingTimeInMs = publishingTimeInMs;
+	}
 
 	private static String makeGoodRandomNews() {
 		return "Good news about " + StockName.randomType();
 	}
 
 	private static String makeBadRandomNews() {
-		return "Good bad about " + StockName.randomType();
+		return "Bad news about " + StockName.randomType();
 	}
 
 	private static String env(String key, String defaultValue) {
@@ -110,5 +111,31 @@ class Publisher {
 		else
 			return defaultValue;
 	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
+	}
+
+	public int getPublishMessageInterval() {
+		return publishMessageInterval;
+	}
+
+	public void setPublishMessageInterval(int publishMessageInterval) {
+		this.publishMessageInterval = publishMessageInterval;
+	}
+
+	public int getPublishingTimeInMs() {
+		return publishingTimeInMs;
+	}
+
+	public void setPublishingTimeInMs(int publishingTimeInMs) {
+		this.publishingTimeInMs = publishingTimeInMs;
+	}
+	
+	
 
 }
