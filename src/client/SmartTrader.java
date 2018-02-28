@@ -14,20 +14,24 @@ import java.net.Socket;
 
 import javax.jms.*;
 
-class cyclicTrader {
-	private static String uId;
+class SmartTrader {
+	private String uId;
+	private boolean isCyclic;
 	
-	public cyclicTrader() {
-		uId = Trader.generateUID();
-		System.out.println("Created a trader with uid : " + uId);
+	public SmartTrader(boolean isCyclic) {
+		this.uId = Trader.generateUID();
+		this.isCyclic = isCyclic;
+		if(isCyclic)
+			System.out.println("Created a cyclic trader with uid : " + this.uId);
+		else 
+			System.out.println("Created an acyclic trader with uid : " + this.uId);
 	}
 
-	public static void main(String []args) throws JMSException, IOException {
+	public void run() throws JMSException, IOException {
 		String user = env("ACTIVEMQ_USER", "admin");
 		String password = env("ACTIVEMQ_PASSWORD", "password");
 		String host = env("ACTIVEMQ_HOST", "127.0.0.1");
 		int port = Integer.parseInt(env("ACTIVEMQ_PORT", "61616"));
-		String destination = arg(args, 0, "event");
 
 		Socket socket;
 		BufferedReader fromServer;
@@ -43,7 +47,7 @@ class cyclicTrader {
 		Connection connection = factory.createConnection(user, password);
 		connection.start();
 		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Destination dest = new ActiveMQTopic(destination);
+		Destination dest = new ActiveMQTopic("event");
 		
 		MessageConsumer consumer = session.createConsumer(dest);
 		long start = System.currentTimeMillis();
@@ -55,10 +59,16 @@ class cyclicTrader {
 				String body = ((TextMessage) msg).getText();
 				String[] news = body.split(" ");
 				if("Good".equals(news[0])) {
-					makeBuyRequest(news[news.length-1], toServer);
+					if(isCyclic)
+						makeBuyRequest(news[news.length-1], toServer);
+					else
+						makeSellRequest(news[news.length-1], toServer);
 					userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 				} else if ("Bad".equals(news[0])) {
-					makeSellRequest(news[news.length-1], toServer);
+					if(isCyclic)
+						makeSellRequest(news[news.length-1], toServer);
+					else
+						makeBuyRequest(news[news.length-1], toServer);
 					userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 				} else if("SHUTDOWN".equals(body)) {
 					long diff = System.currentTimeMillis() - start;
@@ -81,27 +91,20 @@ class cyclicTrader {
 			return defaultValue;
 		return rc;
 	}
-
-	private static String arg(String []args, int index, String defaultValue) {
-		if(index < args.length)
-			return args[index];
-		else
-			return defaultValue;
-	}
 	
-	private static void makeBuyRequest(String stockName, DataOutputStream toServer) {
+	private void makeBuyRequest(String stockName, DataOutputStream toServer) {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
-			Request request = Request.generateRandomImprovedRequest(uId, stock, Type.BIDS);
+			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
 			sendrequest(request, toServer);
 			System.out.println("Buying " + stockName);
 		}
 	}
 	
-	private static void makeSellRequest(String stockName, DataOutputStream toServer) {
+	private void makeSellRequest(String stockName, DataOutputStream toServer) {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
-			Request request = Request.generateRandomImprovedRequest(uId, stock, Type.BIDS);
+			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
 			sendrequest(request, toServer);
 			System.out.println("Selling " + stockName);
 		}
