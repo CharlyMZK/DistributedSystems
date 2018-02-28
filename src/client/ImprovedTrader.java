@@ -34,7 +34,7 @@ class ImprovedTrader extends Trader{
 	 * @throws JMSException
 	 * @throws IOException
 	 */
-	public void run() throws JMSException, IOException {
+	public void trade() throws JMSException, IOException {
 		ImprovedTraderListener improvedTraderListener = new ImprovedTraderListener();
 		Socket socket;
 		BufferedReader fromServer;

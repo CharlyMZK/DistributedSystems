@@ -14,7 +14,7 @@ public abstract class Trader {
 	/**
 	 * Function run allowing user to connect to server and make requests
 	 */
-	protected abstract void run() throws JMSException, IOException;
+	protected abstract void trade() throws JMSException, IOException;
 	
 	/**
 	 * Send the request to the server

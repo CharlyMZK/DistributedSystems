@@ -23,7 +23,7 @@ public class ZeroIQTrader extends Trader {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	public void run() throws JMSException, IOException {
+	public void trade() throws JMSException, IOException {
 		Socket socket;
 		BufferedReader fromServer;
 		DataOutputStream toServer;

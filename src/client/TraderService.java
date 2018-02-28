@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import javax.jms.JMSException;
 
 public class TraderService {
-	public static ArrayList<Trader> clients = new ArrayList<>(); // List of requesting traders
+	public static ArrayList<Trader> traders = new ArrayList<>(); // List of requesting traders
 	public static Timer timer = new Timer();						// Timer creating traders
 	public static int traderCreationInterval = 1000;
 
@@ -40,23 +40,23 @@ public class TraderService {
 		Thread traderThread = new Thread(new Runnable() {
 			public void run() {
 				int traderType = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
-				if (TraderService.clients.size() < 10) {
-					Trader client = null;
+				if (TraderService.traders.size() < 10) {
+					Trader trader = null;
 					switch(traderType) {
 					case 0:
-						client = new ZeroIQTrader();
+						trader = new ZeroIQTrader();
 						break;
 					case 1:
-						client = new ImprovedTrader(true);
+						trader = new ImprovedTrader(true);
 						break;
 					case 2 :
-						client = new ImprovedTrader(false);
+						trader = new ImprovedTrader(false);
 						break;
 					}
-					TraderService.clients.add(client);
-					System.out.println("New trader created. There is now  " + TraderService.clients.size() + " traders.");
+					TraderService.traders.add(trader);
+					System.out.println("New trader created. There is now  " + TraderService.traders.size() + " traders.");
 					try {
-						client.run();
+						trader.trade();
 					} catch (JMSException | IOException e) {
 						e.printStackTrace();
 					} 
