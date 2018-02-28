@@ -68,6 +68,7 @@ public class TraderService {
 		TraderService t = new TraderService();
 		SmartTrader cyclicTrader = new SmartTrader(true);
 		SmartTrader acyclicTrader = new SmartTrader(false);
+		
 		t.scheduleTraderCreation();
 		cyclicTrader.run();
 		acyclicTrader.run();

@@ -17,14 +17,18 @@ import javax.jms.*;
 class SmartTrader {
 	private String uId;
 	private boolean isCyclic;
-	
+
 	public SmartTrader(boolean isCyclic) {
 		this.uId = Trader.generateUID();
 		this.isCyclic = isCyclic;
-		if(isCyclic)
+		if(isCyclic) {
+			this.uId = this.uId + " | Cyclic trader";
 			System.out.println("Created a cyclic trader with uid : " + this.uId);
-		else 
+		} else {
+			this.uId = this.uId + " | Acyclic trader";
 			System.out.println("Created an acyclic trader with uid : " + this.uId);
+		}
+
 	}
 
 	public void run() throws JMSException, IOException {
@@ -37,7 +41,7 @@ class SmartTrader {
 		BufferedReader fromServer;
 		DataOutputStream toServer;
 		UserInterface userInterface = new UserInterface();
-		
+
 		socket = new Socket(host, 9999);
 		toServer = new DataOutputStream(socket.getOutputStream()); // Datastream FROM Server
 		fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Datastream TO Server
@@ -48,23 +52,25 @@ class SmartTrader {
 		connection.start();
 		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 		Destination dest = new ActiveMQTopic("event");
-		
+
 		MessageConsumer consumer = session.createConsumer(dest);
 		long start = System.currentTimeMillis();
 		long count = 1;
-		System.out.println("Waiting for news...");
+
 		while(true) {
 			Message msg = consumer.receive();
 			if( msg instanceof  TextMessage ) {
 				String body = ((TextMessage) msg).getText();
 				String[] news = body.split(" ");
 				if("Good".equals(news[0])) {
+					userInterface.output("[ Trader " + this.uId + "] sending message");
 					if(isCyclic)
 						makeBuyRequest(news[news.length-1], toServer);
 					else
 						makeSellRequest(news[news.length-1], toServer);
 					userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 				} else if ("Bad".equals(news[0])) {
+					userInterface.output("[ Trader " + this.uId + "] sending message");
 					if(isCyclic)
 						makeSellRequest(news[news.length-1], toServer);
 					else
@@ -91,29 +97,28 @@ class SmartTrader {
 			return defaultValue;
 		return rc;
 	}
-	
+
 	private void makeBuyRequest(String stockName, DataOutputStream toServer) {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
 			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
 			sendrequest(request, toServer);
-			System.out.println("Buying " + stockName);
 		}
 	}
-	
+
 	private void makeSellRequest(String stockName, DataOutputStream toServer) {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
 			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
 			sendrequest(request, toServer);
-			System.out.println("Selling " + stockName);
 		}
 	}
-	
+
 	private static void sendrequest(Request request, DataOutputStream toServer) {
 		String message;
 		try {
 			message = request.requestToJson().toString();
+			System.out.println("Client message : " + message);
 			toServer.writeBytes(message + " \n");	
 		} catch (Exception e) {
 			e.printStackTrace();

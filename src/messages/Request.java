@@ -1,6 +1,9 @@
 
 package src.messages;
 import java.rmi.server.UID;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.json.JSONException;
@@ -27,7 +30,7 @@ public class Request {
 		request.stockName = StockName.randomType();
 		request.type =  Type.randomType();
 		request.quantity = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
-		request.price = ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1;
+		request.price = Double.parseDouble(String.format(Locale.US, "%.2f", ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1));
 
 		return request;
 	}
@@ -40,7 +43,7 @@ public class Request {
 		request.stockName = stockName;
 		request.type =  type;
 		request.quantity = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
-		request.price = ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1;
+		request.price = Double.parseDouble(String.format(Locale.US, "%.2f", ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1));
 
 		return request;
 	}
