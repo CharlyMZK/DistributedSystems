@@ -20,6 +20,10 @@ public class PublisherServiceConnector {
 	private Session session;
 	private MessageProducer producer;
 
+	/**
+	 * Constructor hydrating the connexion params
+	 * @param destinationParams
+	 */
 	public PublisherServiceConnector(String[] destinationParams) {
 		user = env("ACTIVEMQ_USER", "admin");
 		password = env("ACTIVEMQ_PASSWORD", "password");
@@ -28,7 +32,11 @@ public class PublisherServiceConnector {
 		destination = arg(destinationParams, 0, "event");
 	}
 
-
+	/**
+	 * Initialise publisher service
+	 * @return
+	 * @throws JMSException
+	 */
 	public MessageProducer initConnexion() throws JMSException {
 		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + host + ":" + port);
 		connection = factory.createConnection(user, password);
@@ -40,7 +48,12 @@ public class PublisherServiceConnector {
 		return producer;
 	}
 	
-	
+	/**
+	 * Get env vars
+	 * @param key
+	 * @param defaultValue
+	 * @return env var value
+	 */
 	private static String env(String key, String defaultValue) {
 		String rc = System.getenv(key);
 		if (rc == null)
@@ -48,6 +61,13 @@ public class PublisherServiceConnector {
 		return rc;
 	}
 
+	/**
+	 * Get arg
+	 * @param args
+	 * @param index
+	 * @param defaultValue
+	 * @return value
+	 */
 	private static String arg(String[] args, int index, String defaultValue) {
 		if (index < args.length)
 			return args[index];
