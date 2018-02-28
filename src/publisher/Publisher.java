@@ -62,7 +62,7 @@ class Publisher {
 					String body = getRandomNews();
 					long executionTime = System.currentTimeMillis();
 					long duration = (executionTime - startTime); // divide by 1000000 to get milliseconds.
-					TextMessage msg = session.createTextMessage();
+					TextMessage msg = session.createTextMessage(body);
 					producer.send(msg);
 					System.out.println("Sending, " + body);
 
