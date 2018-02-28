@@ -1,8 +1,6 @@
 
 package src.messages;
 import java.rmi.server.UID;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Locale;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -34,7 +32,7 @@ public class Request {
 
 		return request;
 	}
-	
+
 	public static Request generateRandomImprovedRequest(String idClient, StockName stockName, Type type) {
 		Request request = new Request();
 
@@ -51,7 +49,7 @@ public class Request {
 	//Create a JSONObject representing the instance
 	public JSONObject requestToJson() throws JSONException {
 		JSONObject request = new JSONObject();
-		
+
 		request.put("idClient", idClient);
 		request.put("idRequest", idRequest);
 		request.put("stockName", stockName);
@@ -76,7 +74,7 @@ public class Request {
 
 		return request;
 	}
-	
+
 	//Return true if the instance and the request match
 	public Boolean match(Request request)
 	{
@@ -90,7 +88,7 @@ public class Request {
 		}
 		return false;
 	}
-	
+
 	//Return the request formated to fit in a csv file
 	public String toCsvString()
 	{
@@ -121,7 +119,7 @@ public class Request {
 		this.idRequest = idRequest;
 	}
 
-	
+
 
 	public StockName getStockName() {
 		return stockName;
@@ -157,6 +155,9 @@ public class Request {
 
 	@Override
 	public String toString() {
-		return "Request [stockName=" + stockName + ", quantity=" + quantity + ", price=" + price + "]";
+		if(type==Type.BIDS)
+			return stockName + " buy " + quantity + " at " + price + " $";
+		else 
+			return stockName + " sell " + quantity + " at " + price + " $";
 	}	
 }

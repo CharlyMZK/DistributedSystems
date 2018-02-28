@@ -36,8 +36,8 @@ public class Trader {
 		fromServer = new BufferedReader(new InputStreamReader(socket.getInputStream())); // Datastream TO Server
 		
 		while (this.generateAndsendRandomRequest()) { // Send requests while connected
-			Thread.sleep(5000);
 			receiveResponse(); // Process server's answer
+			Thread.sleep(5000);
 		}
 
 		// Closing socket and server

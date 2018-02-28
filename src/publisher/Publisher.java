@@ -16,87 +16,121 @@
  */
 package src.publisher;
 
-import org.apache.activemq.ActiveMQConnectionFactory;
-import org.apache.activemq.command.ActiveMQTopic;
-
-import src.messages.StockName;
-
-import java.io.IOException;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import javax.jms.*;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.MessageProducer;
+import javax.jms.Session;
+import javax.jms.TextMessage;
+
+import src.messages.StockName;
 
 class Publisher {
-	public static Timer timer = new Timer();
-	public static int publishMessageInterval = 1000;
-	public static int publishingTimeInMs = 200000;
+	private Timer timer = new Timer(); // Timer used to time the requests send
+	private int publishMessageInterval; // The interval between two publish
+	private int publishingTimeInMs; // How long does the publisher will publish
 
 	public static void main(String[] args) throws JMSException {
+		// Connecting to publish service
+		PublisherServiceConnector publisherConnection = new PublisherServiceConnector(args);
+		publisherConnection.initConnexion();
+		// Creating a publisher and makes him publish
+		Publisher publisher = new Publisher(1000, 200000);
+		publisher.startPublish(publisherConnection);
+	}
 
-		String user = env("ACTIVEMQ_USER", "admin");
-		String password = env("ACTIVEMQ_PASSWORD", "password");
-		String host = env("ACTIVEMQ_HOST", "localhost");
-		int port = Integer.parseInt(env("ACTIVEMQ_PORT", "61616"));
-		String destination = arg(args, 0, "event");
+	/**
+	 * The publisher start publishing every "publishMessageInterval" for
+	 * "publishTimeInMs" using the publisherConnection get in parameters
+	 * 
+	 * @param publisherConnection
+	 */
+	public void startPublish(PublisherServiceConnector publisherConnection) {
+		// Getting connection params
+		Session session = publisherConnection.getSession();
+		MessageProducer producer = publisherConnection.getProducer();
+		Connection connection = publisherConnection.getConnection();
 
-		ActiveMQConnectionFactory factory = new ActiveMQConnectionFactory("tcp://" + host + ":" + port);
-
-		Connection connection = factory.createConnection(user, password);
-		connection.start();
-		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Destination dest = new ActiveMQTopic(destination);
-		MessageProducer producer = session.createProducer(dest);
-		producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
+		// Scheduling a publish
 		long startTime = System.currentTimeMillis();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				try {
-					int randomInt = (Math.random() <= 0.5) ? 1 : 2;
-					String body = "";
-					if (randomInt == 1) {
-						body = makeGoodRandomNews();
-					} else {
-						body = makeBadRandomNews();
-					}
-					TextMessage msg = session.createTextMessage(body);
-					msg.setIntProperty("id", 1);
+					String body = getRandomNews();
+					long executionTime = System.currentTimeMillis();
+					long duration = (executionTime - startTime); // divide by 1000000 to get milliseconds.
+					TextMessage msg = session.createTextMessage();
 					producer.send(msg);
 					System.out.println("Sending, " + body);
+
+					if (duration > publishingTimeInMs) {
+						timer.cancel();
+						timer.purge();
+						producer.send(session.createTextMessage("SHUTDOWN"));
+						connection.close();
+					}
 				} catch (JMSException e) {
 					e.printStackTrace();
-				}
-
-				long executionTime = System.currentTimeMillis();
-				long duration = (executionTime - startTime); // divide by 1000000 to get milliseconds.
-
-				if (duration > publishingTimeInMs) {
-					timer.cancel();
-					timer.purge();
-					try {
-						producer.send(session.createTextMessage("SHUTDOWN"));
-					} catch (JMSException e) {
-						e.printStackTrace();
-					}
-					try {
-						connection.close();
-					} catch (JMSException e) {
-						e.printStackTrace();
-					}
 				}
 			}
 		}, 100, publishMessageInterval);
 	}
 
-	private static String makeGoodRandomNews() {
+	/**
+	 * Constructor, defines the publish times
+	 * 
+	 * @param publishMessageInterval
+	 * @param publishingTimeInMs
+	 */
+	public Publisher(int publishMessageInterval, int publishingTimeInMs) {
+		this.publishMessageInterval = publishMessageInterval;
+		this.publishingTimeInMs = publishingTimeInMs;
+	}
+
+	/**
+	 * Build a good news on a random type
+	 * 
+	 * @return a string
+	 */
+	private String makeGoodRandomNews() {
 		return "Good news about " + StockName.randomType();
 	}
 
-	private static String makeBadRandomNews() {
-		return "Good bad about " + StockName.randomType();
+	/**
+	 * Build a bad news on a random type
+	 * 
+	 * @return a string
+	 */
+	private String makeBadRandomNews() {
+		return "Bad news about " + StockName.randomType();
 	}
 
+	/**
+	 * Build a random news
+	 * 
+	 * @return random news
+	 */
+	private String getRandomNews() {
+		int randomInt = (Math.random() <= 0.5) ? 1 : 2;
+		String news = "";
+		if (randomInt == 1) {
+			news = makeGoodRandomNews();
+		} else {
+			news = makeBadRandomNews();
+		}
+		return news;
+	}
+
+	/**
+	 * Get an environment variable
+	 * 
+	 * @param key
+	 * @param defaultValue
+	 * @return env variable value
+	 */
 	private static String env(String key, String defaultValue) {
 		String rc = System.getenv(key);
 		if (rc == null)
@@ -104,11 +138,43 @@ class Publisher {
 		return rc;
 	}
 
+	/**
+	 * Get args
+	 * 
+	 * @param args
+	 * @param index
+	 * @param defaultValue
+	 * @return arg get
+	 */
 	private static String arg(String[] args, int index, String defaultValue) {
 		if (index < args.length)
 			return args[index];
 		else
 			return defaultValue;
+	}
+
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
+	}
+
+	public int getPublishMessageInterval() {
+		return publishMessageInterval;
+	}
+
+	public void setPublishMessageInterval(int publishMessageInterval) {
+		this.publishMessageInterval = publishMessageInterval;
+	}
+
+	public int getPublishingTimeInMs() {
+		return publishingTimeInMs;
+	}
+
+	public void setPublishingTimeInMs(int publishingTimeInMs) {
+		this.publishingTimeInMs = publishingTimeInMs;
 	}
 
 }

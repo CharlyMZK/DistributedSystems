@@ -17,7 +17,7 @@ import src.messages.*;
 public class BrokerService extends Thread{
 	private Socket client;
 	private static List<Request> requests;
-	public static List<Request> requestsHistory;
+	private static List<Request> requestsHistory;
 
 	BrokerService(Socket client){
 		this.client = client;
@@ -115,5 +115,19 @@ public class BrokerService extends Thread{
 			response.responseState = ResponseState.TIMEOUT;
 		}
 		return response;
+	}
+	
+	public static List<Request> getRequests() {
+		if(requests == null)
+			requests = Collections.synchronizedList(new ArrayList<Request>());
+		
+		return requests;
+	}
+	
+	public static List<Request> getHistoryRequests() {
+		if(requestsHistory == null)
+			requestsHistory = Collections.synchronizedList(new ArrayList<Request>());
+		
+		return requestsHistory;
 	}
 }
