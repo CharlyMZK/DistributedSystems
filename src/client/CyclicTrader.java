@@ -14,20 +14,19 @@ import java.net.Socket;
 
 import javax.jms.*;
 
-class cyclicTrader {
+class CyclicTrader {
 	private static String uId;
 	
-	public cyclicTrader() {
+	public CyclicTrader() {
 		uId = Trader.generateUID();
 		System.out.println("Created a trader with uid : " + uId);
 	}
 
-	public static void main(String []args) throws JMSException, IOException {
+	public static void run() throws JMSException, IOException {
 		String user = env("ACTIVEMQ_USER", "admin");
 		String password = env("ACTIVEMQ_PASSWORD", "password");
-		String host = env("ACTIVEMQ_HOST", "locahost");
+		String host = env("ACTIVEMQ_HOST", "127.0.0.1");
 		int port = Integer.parseInt(env("ACTIVEMQ_PORT", "61616"));
-		String destination = arg(args, 0, "event");
 
 		Socket socket;
 		BufferedReader fromServer;
@@ -43,7 +42,7 @@ class cyclicTrader {
 		Connection connection = factory.createConnection(user, password);
 		connection.start();
 		Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
-		Destination dest = new ActiveMQTopic(destination);
+		Destination dest = new ActiveMQTopic("event");
 		
 		MessageConsumer consumer = session.createConsumer(dest);
 		long start = System.currentTimeMillis();
@@ -80,13 +79,6 @@ class cyclicTrader {
 		if(rc== null)
 			return defaultValue;
 		return rc;
-	}
-
-	private static String arg(String []args, int index, String defaultValue) {
-		if(index < args.length)
-			return args[index];
-		else
-			return defaultValue;
 	}
 	
 	private static void makeBuyRequest(String stockName, DataOutputStream toServer) {

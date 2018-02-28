@@ -64,5 +64,6 @@ public class TraderService {
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException {
 		TraderService t = new TraderService();
 		t.scheduleTraderCreation();
+		CyclicTrader cyclicTrader = new CyclicTrader();
 	}
 }
