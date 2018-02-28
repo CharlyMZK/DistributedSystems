@@ -65,11 +65,11 @@ public class TraderService {
 	 * @throws JMSException 
 	 */
 	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException, JMSException {
-		TraderService t = new TraderService();
+		TraderService traderService = new TraderService();
 		SmartTrader cyclicTrader = new SmartTrader(true);
 		SmartTrader acyclicTrader = new SmartTrader(false);
 		
-		t.scheduleTraderCreation();
+		traderService.scheduleTraderCreation();
 		cyclicTrader.run();
 		acyclicTrader.run();
 	}

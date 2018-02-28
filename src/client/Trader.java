@@ -53,7 +53,7 @@ public class Trader {
 	 * @throws IOException
 	 */
 	private boolean generateAndsendRandomRequest() throws IOException {
-		user.output("[ Trader " +this.uId + "] sending message");
+		user.output("[Trader " +this.uId + "] sending message");
 		String message = "";
 		Request req = new Request();
 		req = req.generateRandomRequest(uId);

@@ -27,7 +27,7 @@ public class Request {
 		request.idRequest = generateUID();
 		request.stockName = StockName.randomType();
 		request.type =  Type.randomType();
-		request.quantity = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
+		request.quantity = ThreadLocalRandom.current().nextInt(1, 10 + 1) / 1;
 		request.price = Double.parseDouble(String.format(Locale.US, "%.2f", ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1));
 
 		return request;
@@ -40,7 +40,7 @@ public class Request {
 		request.idRequest = generateUID();
 		request.stockName = stockName;
 		request.type =  type;
-		request.quantity = ThreadLocalRandom.current().nextInt(0, 2 + 1) / 1;
+		request.quantity = ThreadLocalRandom.current().nextInt(1, 10 + 1) / 1;
 		request.price = Double.parseDouble(String.format(Locale.US, "%.2f", ThreadLocalRandom.current().nextDouble(0, 2 + 1) / 1));
 
 		return request;

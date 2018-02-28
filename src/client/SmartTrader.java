@@ -63,14 +63,14 @@ class SmartTrader {
 				String body = ((TextMessage) msg).getText();
 				String[] news = body.split(" ");
 				if("Good".equals(news[0])) {
-					userInterface.output("[ Trader " + this.uId + "] sending message");
+					userInterface.output("[Trader " + this.uId + "] sending message");
 					if(isCyclic)
 						makeBuyRequest(news[news.length-1], toServer);
 					else
 						makeSellRequest(news[news.length-1], toServer);
 					userInterface.output("Server answers: " + new String(fromServer.readLine()) + '\n');
 				} else if ("Bad".equals(news[0])) {
-					userInterface.output("[ Trader " + this.uId + "] sending message");
+					userInterface.output("[Trader " + this.uId + "] sending message");
 					if(isCyclic)
 						makeSellRequest(news[news.length-1], toServer);
 					else
@@ -109,7 +109,7 @@ class SmartTrader {
 	private void makeSellRequest(String stockName, DataOutputStream toServer) {
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
-			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
+			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.ASKS);
 			sendrequest(request, toServer);
 		}
 	}
