@@ -30,7 +30,7 @@ import javax.jms.*;
 class Publisher {
 	public static Timer timer = new Timer();
 	public static int publishMessageInterval = 1000;
-	public static int publishingTimeInMs = 20000;
+	public static int publishingTimeInMs = 200000;
 
 	public static void main(String[] args) throws JMSException {
 
