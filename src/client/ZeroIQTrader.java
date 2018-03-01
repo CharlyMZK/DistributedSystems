@@ -59,7 +59,6 @@ public class ZeroIQTrader extends Trader {
 		user.output("[Trader " +this.uId + "] sending message");
 		Request req = new Request();
 		req = req.generateRandomRequest(uId);
-		sendRequest(req, toServer);
-		return true;
+		return sendRequest(req, toServer);	
 	}
 }
