@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class BrokerService extends Thread{
 	private Socket client;
 	private static List<Request> requests;
 	private static List<Request> requestsHistory;
+	private static HashMap<StockName,Request> lastStockTransactions;
 
 	BrokerService(Socket client){
 		this.client = client;
@@ -26,6 +28,8 @@ public class BrokerService extends Thread{
 			requests = Collections.synchronizedList(new ArrayList<Request>());
 		if(requestsHistory == null)
 			requestsHistory = Collections.synchronizedList(new ArrayList<Request>());
+		if(lastStockTransactions == null)
+			lastStockTransactions = new HashMap<StockName,Request>();
 	}
 
 	@Override
@@ -95,11 +99,13 @@ public class BrokerService extends Thread{
 					   if(request.getType() == Type.ASKS)
 					   {
 						   requestsHistory.add(request);
+						   lastStockTransactions.put(request.getStockName(), request);
 						   writer.append(request.toCsvString());
 					   }   
 					   else
 					   {
 						   requestsHistory.add(currentRequest);
+						   lastStockTransactions.put(request.getStockName(), request);
 						   writer.append(currentRequest.toCsvString());
 					   }
 					   writer.flush();
@@ -140,5 +146,11 @@ public class BrokerService extends Thread{
 			requestsHistory = Collections.synchronizedList(new ArrayList<Request>());
 		
 		return requestsHistory;
+	}
+	
+	public static HashMap<StockName,Request> getLastStockTransactions(){
+		if(lastStockTransactions == null)
+			lastStockTransactions = new HashMap<StockName,Request>();
+		return lastStockTransactions;
 	}
 }
