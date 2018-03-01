@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.swing.plaf.synth.SynthSeparatorUI;
+
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
@@ -54,7 +56,7 @@ public class PriceClient {
 
 		}
 		catch (XmlRpcException e) {
-			e.printStackTrace();
+			System.out.println("Problem occured, please check servers connexion");
 		}
 	}
 
@@ -72,7 +74,7 @@ public class PriceClient {
 			printResult(result);
 		}
 		catch (XmlRpcException e) {
-			e.printStackTrace();
+			System.out.println("Problem occured, please check servers connexion");
 		}
 	}
 

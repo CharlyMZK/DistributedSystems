@@ -57,7 +57,9 @@ class Journalist {
 						connection.close();
 					}
 				} catch (JMSException e) {
-					e.printStackTrace();
+					System.out.println("Could not send message, closing session");
+					timer.cancel();
+					timer.purge();
 				}
 			}
 		}, 100, publishMessageInterval);
