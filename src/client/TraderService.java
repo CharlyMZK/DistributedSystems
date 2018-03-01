@@ -58,7 +58,9 @@ public class TraderService {
 					try {
 						trader.trade();
 					} catch (JMSException | IOException e) {
-						e.printStackTrace();
+						System.out.println("Problem occured, please check the server connexion");
+						timer.cancel();
+						timer.purge();
 					} 
 				} else {
 					timer.cancel();

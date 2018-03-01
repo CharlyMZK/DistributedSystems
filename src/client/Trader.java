@@ -22,14 +22,15 @@ public abstract class Trader {
 	 * @param request Request to be send
 	 * @param toServer the server
 	 */
-	protected void sendRequest(Request request, DataOutputStream toServer) {
+	protected boolean sendRequest(Request request, DataOutputStream toServer) {
 		String message;
 		try {
 			message = request.requestToJson().toString();
 			System.out.println("Client message : " + message);
 			toServer.writeBytes(message + " \n");	
+			return true;
 		} catch (Exception e) {
-			e.printStackTrace();
+			return false;
 		}
 	}
 
