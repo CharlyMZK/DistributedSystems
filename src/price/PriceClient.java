@@ -18,7 +18,7 @@ public class PriceClient {
 	private static int size = 4;
 
 	public static void main(String[] args) throws Exception {
-		
+
 		// We configure the client
 		XmlRpcClientConfigImpl config = new XmlRpcClientConfigImpl();
 
@@ -26,29 +26,50 @@ public class PriceClient {
 		XmlRpcClient client = new XmlRpcClient();
 		client.setConfig(config);
 		
+		getLastPrice(client, "");
+		getLastPrice(client, "MSFT");
+
 		// Call function with an offset of 0
 		getFromServer(client, 0, "stocks");
 		getFromServer(client, 0, "history");
 
 	}
-	
+
 	public static void getFromServer(XmlRpcClient client, int offset, String method) {
-		
+
 		// First create param with offset and size
 		Object[] params = new Object[]{new Integer(offset), new Integer(size)};
-		System.out.println("About to get available " + method + " from " + params[0] 
+		System.out.println("\nAbout to get available " + method + " from " + params[0] 
 				+ " with size " + params[1] + "." );
-		
+
 		try {
 			List<String> result = decodeList(client.execute("Price." + method, params));
 			printResult(result);
-			
+
 			// While result size is equal to size we call this function again with offset + size
 			if(result.size() == size)
 				getFromServer(client, offset + size, method);
 			else 
 				System.out.println("Get all stocks\n");
-			
+
+		}
+		catch (XmlRpcException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void getLastPrice(XmlRpcClient client, String name) {
+		// First create param with offset and size
+		Object[] params = new Object[]{new String(name)};
+		
+		if(name.equals(""))
+			System.out.println("\nAbout to get last stock price");
+		else
+			System.out.println("\nAbout to get last stock price for " + name);
+
+		try {
+			List<String> result = decodeList(client.execute("Price.lastPrice", params));
+			printResult(result);
 		}
 		catch (XmlRpcException e) {
 			e.printStackTrace();

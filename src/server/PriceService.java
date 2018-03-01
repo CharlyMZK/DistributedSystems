@@ -3,6 +3,7 @@ package src.server;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.XmlRpcServer;
@@ -10,6 +11,7 @@ import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
 import org.apache.xmlrpc.webserver.WebServer;
 
 import src.messages.Request;
+import src.messages.StockName;
 import src.messages.Type;
 
 public class PriceService {
@@ -81,6 +83,36 @@ public class PriceService {
 					break;
 				}
 				response.add(BrokerService.getHistoryRequests().get(i).toString());
+			}
+		}
+
+		return response;
+	}
+
+	public List<String> lastPrice(String stockName) {
+		ArrayList<String> response = new ArrayList();
+		if(stockName.equals(""))
+			System.out.println("Get last price for each stockName");
+		else
+			System.out.println("Get last price for " + stockName);
+
+		if(stockName.equals("MSFT")) {
+			response.add(BrokerService.getLastStockTransactions().get(StockName.MSFT).toString());
+		}
+		else if (stockName.equals("IBM")){
+			response.add(BrokerService.getLastStockTransactions().get(StockName.IBM).toString());
+		}
+		else if (stockName.equals("APL")){
+			response.add(BrokerService.getLastStockTransactions().get(StockName.APL).toString());
+		}
+		else if (stockName.equals("ORCL")){
+			response.add(BrokerService.getLastStockTransactions().get(StockName.ORCL).toString());
+		}
+		else {
+			Iterator it = BrokerService.getLastStockTransactions().entrySet().iterator();
+			while (it.hasNext()) {
+				Map.Entry pair = (Map.Entry)it.next();
+				response.add(pair.getValue().toString());
 			}
 		}
 
