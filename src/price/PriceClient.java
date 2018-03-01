@@ -32,7 +32,7 @@ public class PriceClient {
 		// Call function with an offset of 0
 		getFromServer(client, 0, "stocks");
 		getFromServer(client, 0, "history");
-
+		
 	}
 
 	public static void getFromServer(XmlRpcClient client, int offset, String method) {

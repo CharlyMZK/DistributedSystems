@@ -31,8 +31,7 @@ public class PriceService {
 
 			XmlRpcServerConfigImpl serverConfig =
 					(XmlRpcServerConfigImpl) xmlRpcServer.getConfig();
-			// serverConfig.setEnabledForExtensions(true);
-			// serverConfig.setContentLengthOptional(false);
+
 
 			webServer.start();
 
