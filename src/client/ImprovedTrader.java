@@ -35,6 +35,7 @@ class ImprovedTrader extends Trader{
 	 * @throws IOException
 	 */
 	public void trade() throws JMSException, IOException {
+		boolean run = true;
 		ListenerService improvedTraderListener = new ListenerService();
 		Socket socket;
 		BufferedReader fromServer;
@@ -47,22 +48,27 @@ class ImprovedTrader extends Trader{
 		// ActiveMQ connection
 		MessageConsumer messageConsumer = improvedTraderListener.initConnexion();
 
-		while(true) {	// Run until we have a shutdown message
+		while(run) {	// Run until we have a shutdown message
 			Message msg = messageConsumer.receive();
 			if(msg instanceof  TextMessage) {
 				String body = ((TextMessage) msg).getText();
 				String[] news = body.split(" ");
 				if("Good".equals(news[0])) { // Good news 
-					treatGoodNews(news, fromServer, toServer);
+					run = treatGoodNews(news, fromServer, toServer);
 				} else if ("Bad".equals(news[0])) { // Bad news
-					treatBadNews(news, fromServer, toServer);
+					run = treatBadNews(news, fromServer, toServer);
 				} else if("SHUTDOWN".equals(body)) { // Shutdown message
 					user.output("[Trader " + this.uId + "] quit");
 					break;
 				}
 			} else {
-				System.out.println("Unexpected message type: " + msg.getClass());
+				user.output("Journalist server broke down");
+				break;
 			}
+		}
+		
+		if(!run) {
+			user.output("Borker server broke down");
 		}
 
 		// Closing all connections
@@ -78,15 +84,20 @@ class ImprovedTrader extends Trader{
 	 * @param news News to be used
 	 * @param fromServer Message from server
 	 * @param toServer Message for server
+	 * @return boolean true if the server is responding
 	 * @throws IOException 
 	 */
-	private void treatGoodNews(String[] news, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
+	private boolean treatGoodNews(String[] news, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
+		boolean run;
+		
 		user.output("[Trader " + this.uId + "] sending message");
 		if(this.isCyclic)
-			makeBuyRequest(news[news.length-1], toServer);
+			run = makeBuyRequest(news[news.length-1], toServer);
 		else
-			makeSellRequest(news[news.length-1], toServer);
+			run = makeSellRequest(news[news.length-1], toServer);
 		receiveResponse(fromServer);
+		
+		return run;
 	}
 
 	/**
@@ -95,15 +106,20 @@ class ImprovedTrader extends Trader{
 	 * @param news News to be used
 	 * @param fromServer Message from server
 	 * @param toServer Message for server
+	 * @return boolean true if the server is responding
 	 * @throws IOException 
 	 */
-	private void treatBadNews(String[] news, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
+	private boolean treatBadNews(String[] news, BufferedReader fromServer, DataOutputStream toServer) throws IOException {
+		boolean run;
+		
 		user.output("[Trader " + this.uId + "] sending message");
 		if(this.isCyclic)
-			makeSellRequest(news[news.length-1], toServer);
+			run = makeSellRequest(news[news.length-1], toServer);
 		else
-			makeBuyRequest(news[news.length-1], toServer);
+			run = makeBuyRequest(news[news.length-1], toServer);
 		receiveResponse(fromServer);
+		
+		return run;
 	}
 
 	/**
@@ -111,13 +127,18 @@ class ImprovedTrader extends Trader{
 	 * 
 	 * @param stockName Name of the stock to buy
 	 * @param toServer Message for server
+	 * @return boolean true if the server is responding
 	 */
-	private void makeBuyRequest(String stockName, DataOutputStream toServer) {
+	private boolean makeBuyRequest(String stockName, DataOutputStream toServer) {
+		boolean run = true;
+		
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
 			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.BIDS);
-			sendRequest(request, toServer);
+			run = sendRequest(request, toServer);
 		}
+		
+		return run;
 	}
 
 	/**
@@ -125,12 +146,17 @@ class ImprovedTrader extends Trader{
 	 * 
 	 * @param stockName Name of the stock to sell
 	 * @param toServer Message for server
+	 * @return boolean true if the server is responding
 	 */
-	private void makeSellRequest(String stockName, DataOutputStream toServer) {
+	private boolean makeSellRequest(String stockName, DataOutputStream toServer) {
+		boolean run = true; 
+		
 		StockName stock = StockName.valueOf(StockName.class, stockName);
 		if(stock != null) {
 			Request request = Request.generateRandomImprovedRequest(this.uId, stock, Type.ASKS);
-			sendRequest(request, toServer);
+			run = sendRequest(request, toServer);
 		}
+		
+		return run;
 	}
 }
